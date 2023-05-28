@@ -1,0 +1,48 @@
+data_class: 'PUREYULIAO'
+model_class: GPT2Chinese
+data_class_module: "gpt2_generator.data"
+model_class_module: "gpt2_generator.lit_models"
+
+trainer:
+  devices: [5,6]
+  accelator: 'gpu'
+  strategy: 'ddp'
+
+  max_epochs: 5
+  min_epochs: 2
+
+data:
+  n_ctx: 1024
+  stride: 678
+  batch_size: 4
+  num_workers: 8
+  raw: True
+  raw_dir: 'gpt2_generator/data/demo/raw'
+  train_dir: 'gpt2_generator/data/demo/train'
+
+tokenizer:
+  tokenizer_path: 'files/tokenizer/vocab.txt'
+
+kg:
+  pretrained_file: 'transformer'
+  load_checkpoint: 'None'
+
+gpt2:
+  pretrained_file: "gpt2_generator/models/final_model/gpt2" 
+  load_checkpoint: 'None'
+
+litmodel:
+  load_checkpoint: 'None'
+  optimizer: 'Adam'
+  lr: 1e-3
+  one_cycle_max_lr: 1e-3
+  one_cycle_total_steps: 100
+  loss: cross_entropy
+  stop_early: False
+  final_path: 
+
+chkpt:
+  every_n_epochs: 2
+
+model:
+

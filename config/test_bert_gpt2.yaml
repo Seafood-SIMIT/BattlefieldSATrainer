@@ -1,0 +1,38 @@
+trainer:
+  stop_early: False
+  chkpt_every_n_epochs: 10
+  max_epochs: 50
+  devices: 1
+  strategy: 'ddp'
+  accelerator: 'gpu'
+
+data:
+  data_class: 'KGYULIAO'
+  data_class_module: "training.data_loader"
+  n_ctx: 1024
+  stride: 678
+  batch_size: 1
+  num_workers: 0
+  raw: True
+  raw_dir: 'files/dataset/demo/raw'
+  train_dir: 'files/dataset/demo/train'
+
+tokenizer:
+  tokenizer_path: 'files/tokenizer/vocab_2.txt'
+kg:
+  model_name: 'bert-base-chinese'
+  pretrained_file: 'files/kg_bert_final_model'
+  num_labels: 3
+  load_checkpoint: 'None'
+  optimizer: 'Adam'
+  lr: 1e-3
+  loss: cross_entropy
+
+gpt2:
+  pretrained_file: "files/gpt2_gpt2_final_model" 
+  load_checkpoint: 'None'
+  #chkpt_path: '20230428_train_gpt2_emanepoch=0049-validation.loss=1.658.chkpt'
+  chkpt_path: '*.ckpt'
+  loss: cross_entropy
+  optimizer: 'Adam'
+  lr: 0.001

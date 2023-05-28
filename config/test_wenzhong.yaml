@@ -1,0 +1,46 @@
+trainer:
+  stop_early: False
+  chkpt_every_n_epochs: 10
+  max_epochs: 100
+  devices: 1
+  strategy: 'ddp'
+  accelerator: 'gpu'
+
+data:
+  data_class: 'WenzhongQADataModel'
+  data_class_module: "training.data_loader"
+  data_path: 'files/dataset/demo/raw/demo.csv'
+  data_type_name: 'csv'
+  max_seq_length: 1024
+  train_batchsize: 2
+  valid_batchsize: 4
+  do_eval_only: False
+  n_ctx: 1024
+  stride: 678
+  batch_size: 2
+  num_workers: 16
+  raw: True
+  raw_dir: 'files/dataset/demo/raw/demo.csv'
+  train_dir: 'files/dataset/demo/train'
+
+tokenizer:
+  tokenizer_path: 'IDEA-CCNL/Wenzhong-GPT2-110M'
+kg:
+  model_name: 'bert-base-chinese'
+  pretrained_file: 'files/kg_bert_final_model'
+  num_labels: 3
+  load_checkpoint: 'None'
+  optimizer: 'Adam'
+  lr: 1e-3
+  loss: cross_entropy
+
+gpt2:
+  pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
+  load_checkpoint: True
+  chkpt_path: "files/wenzhong/model.ckpt"
+  loss: cross_entropy
+  optimizer: 'Adam'
+  lr: 0.001
+  weight_decay: 0.1
+  learning_rate: 0.0001
+  warmup: 0.01

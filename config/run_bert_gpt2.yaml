@@ -1,0 +1,43 @@
+
+trainer:
+  stop_early: False
+  chkpt_every_n_epochs: 10
+  max_epochs: 50
+  devices: 4
+  strategy: 'deepspeed_stage_3'
+  accelerator: 'gpu'
+
+data:
+  data_class: 'WHOLEYULIAO'
+  data_class_module: "training.data_loader"
+  n_ctx: 1024
+  stride: 678
+  batch_size: 2
+  num_workers: 8
+  raw: True
+  raw_dir: 'files/dataset/demo/raw'
+  train_dir: 'files/dataset/demo/train'
+
+tokenizer:
+  tokenizer_path: 'files/tokenizer/vocab.txt'
+kg:
+  model_name: 'bert-base-chinese'
+  pretrained_file: 'files/kg_bert_final_model'
+  load_checkpoint: 'None'
+  optimizer: 'Adam'
+  lr: 1e-3
+  loss: cross_entropy
+
+gpt2:
+  pretrained_file: "files/gpt2_gpt2_final_model" 
+  load_checkpoint: 'None'
+  loss: cross_entropy
+  optimizer: 'Adam'
+  lr: 0.001
+
+litmodel:
+  one_cycle_max_lr: 1e-3
+  one_cycle_total_steps: 100
+  final_path: 
+
+
