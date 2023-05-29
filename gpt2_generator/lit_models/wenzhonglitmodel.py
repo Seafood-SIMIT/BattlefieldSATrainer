@@ -52,7 +52,7 @@ class WenzhongQALitModel(pl.LightningModule):
             input_ids=batch['input_ids'], attention_mask=batch['attention_mask'], labels=batch['labels'])
         # output = self.model(input_ids=batch['input_ids'], labels=batch['labels'])
         # acc = self.comput_metrix(output.logits, batch['labels'])
-        self.log('train_loss', output.loss)
+        self.log('train_loss', output.loss,on_step=True, on_epoch=True, prog_bar=True,logger=True)
         return output.loss
 
     def comput_metrix(self, logits, labels):
@@ -68,7 +68,7 @@ class WenzhongQALitModel(pl.LightningModule):
             input_ids=batch['input_ids'], attention_mask=batch['attention_mask'], labels=batch['labels'])
         # output = self.model(input_ids=batch['input_ids'], labels=batch['labels'])
         # acc = self.comput_metrix(output.logits, batch['labels'])
-        self.log('val_loss', output.loss)
+        self.log('val_loss', output.loss,prog_bar=True)
         # self.log('val_acc', acc)
 
     def configure_optimizers(self):

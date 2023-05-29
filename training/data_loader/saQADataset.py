@@ -41,11 +41,10 @@ class GPT2QADataset(Dataset):
 
                 with open(os.path.join(data_path,a_file), "r", encoding='utf8') as f:
                     lines = csv.reader(f,delimiter=',')
-                    #total_num = len(lines)
                     data_gen = lines
 
                     for line in data_gen:
-                        data.append(self.data_parse(line))
+                        data.append(self.data_parse(line[0:6]))
                     bar.update()
 
         #if self.data_size > 5:

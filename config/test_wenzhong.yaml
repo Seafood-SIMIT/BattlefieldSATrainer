@@ -37,7 +37,7 @@ kg:
 gpt2:
   pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   load_checkpoint: True
-  chkpt_path: "files/wenzhong/model.ckpt"
+  chkpt_path: "training/logs/lightning_logs/version_0/epoch=0099-validation.loss=0.001.ckpt"
   loss: cross_entropy
   optimizer: 'Adam'
   lr: 0.001
