@@ -18,6 +18,10 @@ from kg_generator import *
 from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel
 from training.util import import_class, setup_data_from_args
 
+import nemo
+#from nemo.collections.nlp.parts.nlp_overrides import NLPDDPStrategy
+
+
 
 # In order to ensure reproducible experiments, we must set random seeds.
 np.random.seed(42)
@@ -82,6 +86,7 @@ def main():
 
     trainer = pl.Trainer(devices=hp.trainer.devices,accelerator=hp.trainer.accelerator,
                         max_epochs=hp.trainer.max_epochs,
+                        #strategy=hp.trainer.strategy,
                         strategy=hp.trainer.strategy,
                         callbacks=callbacks,
                         logger = logger)

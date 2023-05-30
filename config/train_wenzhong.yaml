@@ -2,9 +2,9 @@ trainer:
   stop_early: False
   chkpt_every_n_epochs: 20
   max_epochs: 100
-  devices: 6
-  strategy: 'deepspeed_stage_3_offload'
-  accelerator: 'auto'
+  devices: 4
+  strategy: 'deepspeed_stage_2'
+  accelerator: 'gpu'
 
 data:
   data_class: 'WenzhongQADataModel'
