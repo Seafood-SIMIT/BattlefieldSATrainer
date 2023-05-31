@@ -83,7 +83,7 @@ class WenzhongQALitModel(pl.LightningModule):
             'params': [p for n, p in paras if any(nd in n for nd in no_decay)],
             'weight_decay': 0.0
         }]
-        optimizer = torch.optim.AdamW(paras, lr=self.args.learning_rate)
+        optimizer = torch.optim.Adam(paras, lr=self.args.learning_rate)
         scheduler = get_linear_schedule_with_warmup(
             optimizer, int(self.total_step * self.args.warmup),
             self.total_step)
