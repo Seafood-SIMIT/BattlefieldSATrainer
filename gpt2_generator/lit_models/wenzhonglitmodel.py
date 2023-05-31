@@ -2,6 +2,7 @@ import os
 import torch
 import argparse
 import pytorch_lightning as pl
+import deepspeed
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning import Trainer, loggers
 from transformers.optimization import get_linear_schedule_with_warmup
@@ -84,6 +85,7 @@ class WenzhongQALitModel(pl.LightningModule):
             'weight_decay': 0.0
         }]
         optimizer = torch.optim.Adam(paras, lr=self.args.learning_rate)
+        optimizer = deepspeed.ops.adam.DeepSpeedCPUAdam(paras, lr=self.args.learning_rate)
         scheduler = get_linear_schedule_with_warmup(
             optimizer, int(self.total_step * self.args.warmup),
             self.total_step)
