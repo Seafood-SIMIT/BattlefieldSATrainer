@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 from transformers import AutoTokenizer
 import csv
+import json
 
 class GPT2QADataset(Dataset):
     '''
@@ -33,18 +34,16 @@ class GPT2QADataset(Dataset):
         # 有进度条展示
         #if self.data_size <= 5:
         with tqdm(total=None, desc=f'{self.data_type_name}处理进度', mininterval=0.3) as bar:
-            data = []
+            data = {}
             for a_file in os.listdir(data_path):
                 # for mac osx
                 if a_file.startswith('.'):
                     continue
 
+                
                 with open(os.path.join(data_path,a_file), "r", encoding='utf8') as f:
-                    lines = csv.reader(f,delimiter=',')
-                    data_gen = lines
-
-                    for line in data_gen:
-                        data.append(self.data_parse(line[0:6]))
+                    lines = json.load(f)
+                    data.update(lines)
                     bar.update()
 
         #if self.data_size > 5:
@@ -63,9 +62,9 @@ class GPT2QADataset(Dataset):
         将数据转换成模型训练的输入
         """
         # time, mid, blue, red,trible, discription
-        r_time, r_mid_qb, r_red_qb, r_blue_qb,_, r_sa = item
         # conver to ids
-        r_qb = r_time+';'+r_mid_qb+';'+r_red_qb+';'+r_blue_qb
+        r_qb = item['时刻']+';'+item['中立情报']+';'+item['获取情报']+';'+item['我方情报']
+        r_sa = item['态势描述']
         inputs_dict = self.tokenizer.encode_plus(r_qb+r_sa,
                                                  max_length=self.max_seq_length, padding='max_length',
                                                  truncation=True, return_tensors='pt')
