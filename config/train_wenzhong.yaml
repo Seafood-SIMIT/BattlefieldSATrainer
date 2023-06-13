@@ -2,7 +2,7 @@ trainer:
   stop_early: False
   chkpt_every_n_epochs: 20
   max_epochs: 200
-  devices: 8
+  devices: 4
   strategy: 'deepspeed_stage_3'
   accelerator: 'gpu'
 
@@ -11,7 +11,7 @@ data:
   data_class_module: "training.data_loader"
   data_path: 'files/dataset/wyl'
   data_type_name: 'csv'
-  max_seq_length: 256
+  max_seq_length: 600
   train_batchsize: 2
   valid_batchsize: 2
   do_eval_only: False
