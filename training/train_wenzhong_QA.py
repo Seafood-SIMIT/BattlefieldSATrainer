@@ -64,7 +64,7 @@ def main():
     logger = pl.loggers.TensorBoardLogger(log_dir)
     experiment_dir = logger.log_dir
 
-    goldstar_metric = "validation/cer" if hp.kg.loss in ("transformer",) else "val_loss"
+    goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
     filename_format = "epoch={epoch:04d}-validation.loss={val_loss:.3f}"
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
         save_top_k=5,

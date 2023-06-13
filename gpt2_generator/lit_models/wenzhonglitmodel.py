@@ -33,6 +33,10 @@ class WenzhongQALitModel(pl.LightningModule):
                                   / (max(1, num_gpus) * self.trainer.accumulate_grad_batches))
             print('Total training step:', self.total_step)
 
+    def forward(self,x):
+        output = self.model(**x)
+        return output.logits
+        
     def predict(self, x):
         output = self.model.generate(**x,
                                     max_length=256,
@@ -53,7 +57,7 @@ class WenzhongQALitModel(pl.LightningModule):
             input_ids=batch['input_ids'], attention_mask=batch['attention_mask'], labels=batch['labels'])
         # output = self.model(input_ids=batch['input_ids'], labels=batch['labels'])
         # acc = self.comput_metrix(output.logits, batch['labels'])
-        self.log('train_loss', output.loss,on_step=True, on_epoch=True, prog_bar=True,logger=True)
+        self.log('train_loss', output.loss,on_epoch=True, prog_bar=True,logger=True)
         return output.loss
 
     def comput_metrix(self, logits, labels):
@@ -69,7 +73,7 @@ class WenzhongQALitModel(pl.LightningModule):
             input_ids=batch['input_ids'], attention_mask=batch['attention_mask'], labels=batch['labels'])
         # output = self.model(input_ids=batch['input_ids'], labels=batch['labels'])
         # acc = self.comput_metrix(output.logits, batch['labels'])
-        self.log('val_loss', output.loss,prog_bar=True)
+        self.log('val_loss', output.loss,on_epoch=True,prog_bar=True,logger=True)
         # self.log('val_acc', acc)
 
     def configure_optimizers(self):
@@ -85,7 +89,7 @@ class WenzhongQALitModel(pl.LightningModule):
             'weight_decay': 0.0
         }]
         optimizer = torch.optim.Adam(paras, lr=self.args.learning_rate)
-        optimizer = deepspeed.ops.adam.DeepSpeedCPUAdam(paras, lr=self.args.learning_rate)
+        #optimizer = deepspeed.ops.adam.DeepSpeedCPUAdam(paras, lr=self.args.learning_rate)
         scheduler = get_linear_schedule_with_warmup(
             optimizer, int(self.total_step * self.args.warmup),
             self.total_step)

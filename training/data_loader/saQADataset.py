@@ -14,14 +14,14 @@ class GPT2QADataset(Dataset):
     for large datasets please use mmapdatasets(doing)
     '''
 
-    def __init__(self, args,tokenizer):
+    def __init__(self, args,data_path,tokenizer):
         super().__init__()
         self.tokenizer = tokenizer
         if self.tokenizer.pad_token is None:
             self.tokenizer.add_special_tokens({'pad_token': '<|endoftext|>'})
         #self.data_size = os.path.getsize(args.data_path)/1024/1024/1024
         self.data_type_name = args.data_type_name
-        self.data = self.load_data(args.data_path)
+        self.data = self.load_data(data_path)
         self.max_seq_length = args.max_seq_length
 
     def __len__(self):
@@ -34,7 +34,7 @@ class GPT2QADataset(Dataset):
         # 有进度条展示
         #if self.data_size <= 5:
         with tqdm(total=None, desc=f'{self.data_type_name}处理进度', mininterval=0.3) as bar:
-            data = {}
+            data = []
             for a_file in os.listdir(data_path):
                 # for mac osx
                 if a_file.startswith('.'):
@@ -43,7 +43,8 @@ class GPT2QADataset(Dataset):
                 
                 with open(os.path.join(data_path,a_file), "r", encoding='utf8') as f:
                     lines = json.load(f)
-                    data.update(lines)
+                    for line in lines:
+                        data.append(line)
                     bar.update()
 
         #if self.data_size > 5:
@@ -100,10 +101,9 @@ class WenzhongQADataModel(pl.LightningDataModule):
         self.train_batchsize = args.train_batchsize
         self.valid_batchsize = args.valid_batchsize
         if not args.do_eval_only:
-            self.train_data = GPT2QADataset(args,tokenizer)
-            self.valid_data = self.train_data
-        print(self.train_data[2])
-        self.test_data = self.train_data
+            self.train_data = GPT2QADataset(args,os.path.join(args.data_path,'train'),tokenizer)
+            self.valid_data = GPT2QADataset(args,os.path.join(args.data_path,'valid'),tokenizer)
+        self.test_data = self.valid_data
 
     def train_dataloader(self):
         return DataLoader(

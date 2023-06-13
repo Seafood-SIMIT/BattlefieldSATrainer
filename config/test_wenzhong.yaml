@@ -1,28 +1,25 @@
 trainer:
   stop_early: False
-  chkpt_every_n_epochs: 10
-  max_epochs: 100
+  chkpt_every_n_epochs: 20
+  max_epochs: 200
   devices: 1
-  strategy: 'ddp'
+  strategy: 'deepspeed_stage_3'
   accelerator: 'gpu'
 
 data:
   data_class: 'WenzhongQADataModel'
   data_class_module: "training.data_loader"
-  data_path: 'files/dataset/demo/raw/demo.csv'
+  data_path: 'files/dataset/wyl'
   data_type_name: 'csv'
-  max_seq_length: 1024
+  max_seq_length: 512
   train_batchsize: 2
-  valid_batchsize: 4
+  valid_batchsize: 2
   do_eval_only: False
   n_ctx: 1024
   stride: 678
-  batch_size: 2
+  batch_size: 4
   num_workers: 16
   raw: True
-  raw_dir: 'files/dataset/demo/raw/demo.csv'
-  train_dir: 'files/dataset/demo/train'
-
 tokenizer:
   tokenizer_path: 'IDEA-CCNL/Wenzhong-GPT2-110M'
 kg:
@@ -37,7 +34,7 @@ kg:
 gpt2:
   pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   load_checkpoint: True
-  chkpt_path: "training/logs/lightning_logs/version_0/epoch=0099-validation.loss=0.001.ckpt"
+  chkpt_path: "training/logs/lightning_logs/version_1/epoch=0099-validation.loss=1.722.ckpt"
   loss: cross_entropy
   optimizer: 'Adam'
   lr: 0.001
