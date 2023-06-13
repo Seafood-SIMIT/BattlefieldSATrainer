@@ -1,5 +1,6 @@
 files/tokenizer
 files/wenzhong
+files/wenzhong_3.5B
 training_logs
 training/logs
 */__pycache__
