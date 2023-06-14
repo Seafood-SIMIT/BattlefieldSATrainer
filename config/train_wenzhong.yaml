@@ -1,6 +1,5 @@
 trainer:
   stop_early: False
-  chkpt_every_n_epochs: 20
   max_epochs: 200
   devices: 4
   strategy: 'deepspeed_stage_3'
@@ -10,16 +9,13 @@ data:
   data_class: 'WenzhongQADataModel'
   data_class_module: "training.data_loader"
   data_path: 'files/dataset/wyl'
-  data_type_name: 'csv'
-  max_seq_length: 600
+  max_seq_length: 1024
   train_batchsize: 2
   valid_batchsize: 2
   do_eval_only: False
   n_ctx: 1024
   stride: 678
-  batch_size: 4
   num_workers: 16
-  raw: True
 
 tokenizer:
   tokenizer_path: 'IDEA-CCNL/Wenzhong-GPT2-110M'
@@ -29,9 +25,17 @@ gpt2:
   pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   #pretrained_file: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
   load_checkpoint: False
-  loss: cross_entropy
-  optimizer: 'Adam'
   lr: 0.0001
   weight_decay: 0.1
   learning_rate: 0.0001
   warmup: 0.01
+
+ckpt:
+  monitor: 'train_loss'
+  save_top_k: 3
+  mode: 'min'
+  every_n_train_steps: 100
+  save_weights_only: True
+  dir_path: './ckpt'
+  save_last: True
+  file_name: 'Default'

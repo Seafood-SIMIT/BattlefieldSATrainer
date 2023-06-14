@@ -82,19 +82,6 @@ class GPT2QADataset(Dataset):
 
 
 class WenzhongQADataModel(pl.LightningDataModule):
-    @staticmethod
-    def add_data_specific_args(parent_args):
-        parser = parent_args.add_argument_group('GPT2QADataModel')
-        parser.add_argument('--data_dir', type=str, required=True)
-        parser.add_argument('--num_workers', default=2, type=int)
-        parser.add_argument('--train_data', default='train.txt', type=str)
-        parser.add_argument('--valid_data', default='valid.txt', type=str)
-        parser.add_argument('--test_data', default='test.txt', type=str)
-        parser.add_argument('--train_batchsize', type=int, required=True)
-        parser.add_argument('--valid_batchsize', type=int, required=True)
-        parser.add_argument('--max_seq_length', default=1024, type=int)
-        return parent_args
-
     def __init__(self, args, tokenizer):
         super().__init__()
         self.args = args

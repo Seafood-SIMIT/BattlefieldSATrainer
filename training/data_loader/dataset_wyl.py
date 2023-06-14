@@ -49,7 +49,7 @@ def build_files(tokenized_data_path, tokenizer, raw_path):
                 full_data.append(data)
 
                 #add to list
-    print('read CSV finish')
+    print('read JSON finish')
     return full_data
 
 

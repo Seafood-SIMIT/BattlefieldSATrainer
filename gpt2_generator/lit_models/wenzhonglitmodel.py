@@ -8,6 +8,16 @@ from pytorch_lightning import Trainer, loggers
 from transformers.optimization import get_linear_schedule_with_warmup
 from transformers import GPT2LMHeadModel
 
+class GPT2FineTuneQAModelCheckpoint:
+    def __init__(self, args):
+        self.callbacks = ModelCheckpoint(monitor=args.monitor,
+                                         save_top_k=args.save_top_k,
+                                         mode=args.mode,
+                                         every_n_train_steps=args.every_n_train_steps,
+                                         save_weights_only=args.save_weights_only,
+                                         dirpath=args.dirpath,
+                                         filename=args.filename,
+                                         save_last=args.save_last)
 class WenzhongQALitModel(pl.LightningModule):
 
     @staticmethod
@@ -23,12 +33,13 @@ class WenzhongQALitModel(pl.LightningModule):
         self.args = args
         self.num_data = num_data
         print('num_data:', num_data)
-        self.model=model
+        self.model = model
+        self.save_hyperparameters()
+        
 
     def setup(self, stage) -> None:
         if stage == 'fit':
-            #num_gpus = self.trainer.gpus if self.trainer.gpus is not None else 0
-            num_gpus=1
+            num_gpus = self.trainer.gpus if self.trainer.gpus is not None else 0
             self.total_step = int(self.trainer.max_epochs * self.num_data
                                   / (max(1, num_gpus) * self.trainer.accumulate_grad_batches))
             print('Total training step:', self.total_step)
@@ -37,7 +48,7 @@ class WenzhongQALitModel(pl.LightningModule):
         output = self.model(**x)
         return output.logits
         
-    def predict(self, x):
+    def predict_backup(self, x):
         output = self.model.generate(**x,
                                     max_length=256,
                                     return_dict_in_generate=True,
@@ -88,7 +99,7 @@ class WenzhongQALitModel(pl.LightningModule):
             'params': [p for n, p in paras if any(nd in n for nd in no_decay)],
             'weight_decay': 0.0
         }]
-        optimizer = torch.optim.Adam(paras, lr=self.args.learning_rate)
+        optimizer = torch.optim.AdamW(paras, lr=self.args.learning_rate)
         #optimizer = deepspeed.ops.adam.DeepSpeedCPUAdam(paras, lr=self.args.learning_rate)
         scheduler = get_linear_schedule_with_warmup(
             optimizer, int(self.total_step * self.args.warmup),

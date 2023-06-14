@@ -15,7 +15,7 @@ sys.path.append('.')
 
 from utils import HParam
 from kg_generator import *
-from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel
+from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel, GPT2FineTuneQAModelCheckpoint
 from training.util import import_class, setup_data_from_args
 
 #import nemo
@@ -54,8 +54,10 @@ def main():
 
 
     if hp.gpt2.load_checkpoint :
+        print("Loading Checkpoint ...")
         gpt2_litmodel = gpt2_litmodel.load_from_checkpoint(hp.litmodel.load_checkpoint, args=hp, model=gpt2_model)
     else:
+        print("Loading Pretrained Model ...")
         gpt2_litmodel = gpt2_litmodel(args=hp.gpt2, model=gpt2_model,num_data=len(data.train_dataloader()))
 
     # Call baks
@@ -66,15 +68,8 @@ def main():
 
     goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
     filename_format = "epoch={epoch:04d}-validation.loss={val_loss:.3f}"
-    checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        save_top_k=5,
-        filename=filename_format,
-        monitor=goldstar_metric,
-        mode="min",
-        auto_insert_metric_name=False,
-        dirpath=experiment_dir,
-        every_n_epochs=hp.trainer.chkpt_every_n_epochs,
-    )
+    hp.ckpt.file_name = filename_format
+    checkpoint_callback = GPT2FineTuneQAModelCheckpoint(hp.ckpt)
 
     summary_callback = pl.callbacks.ModelSummary(max_depth=2)
 
