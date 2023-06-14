@@ -34,12 +34,13 @@ class WenzhongQALitModel(pl.LightningModule):
         self.num_data = num_data
         print('num_data:', num_data)
         self.model = model
-        self.save_hyperparameters()
+        #self.save_hyperparameters()
         
 
     def setup(self, stage) -> None:
         if stage == 'fit':
-            num_gpus = self.trainer.gpus if self.trainer.gpus is not None else 0
+            #num_gpus = self.trainer.gpus if self.trainer.gpus is not None else 0
+            num_gpus = 4
             self.total_step = int(self.trainer.max_epochs * self.num_data
                                   / (max(1, num_gpus) * self.trainer.accumulate_grad_batches))
             print('Total training step:', self.total_step)

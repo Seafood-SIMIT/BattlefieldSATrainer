@@ -6,7 +6,7 @@ import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.utilities import rank_zero_info, rank_zero_only
 import torch
-
+from pytorch_lightning.callbacks import ModelCheckpoint
 import os
 #os.chdir('/home/seafood/wkdir/kg_trainer')
 
@@ -15,7 +15,7 @@ sys.path.append('.')
 
 from utils import HParam
 from kg_generator import *
-from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel, GPT2FineTuneQAModelCheckpoint
+from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel
 from training.util import import_class, setup_data_from_args
 
 #import nemo
@@ -66,10 +66,19 @@ def main():
     logger = pl.loggers.WandbLogger(project='BASAer',name=args.model_name,save_dir=log_dir)
     experiment_dir = logger.log_dir
 
-    goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
+    #goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
     filename_format = "epoch={epoch:04d}-validation.loss={val_loss:.3f}"
     hp.ckpt.file_name = filename_format
-    checkpoint_callback = GPT2FineTuneQAModelCheckpoint(hp.ckpt)
+    arg = hp.ckpt
+    hp.ckpt.dirpath = hp.ckpt.dirpath+'/'+args.model_name
+    checkpoint_callback = ModelCheckpoint(monitor=arg.monitor,
+                                         save_top_k=arg.save_top_k,
+                                         mode=arg.mode,
+                                         every_n_train_steps=arg.every_n_train_steps,
+                                         save_weights_only=arg.save_weights_only,
+                                         dirpath=arg.dirpath,
+                                         filename=arg.file_name,
+                                         save_last=arg.save_last)
 
     summary_callback = pl.callbacks.ModelSummary(max_depth=2)
 
