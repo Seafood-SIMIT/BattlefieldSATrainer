@@ -1,4 +1,5 @@
 import os
+from typing import Any, Optional
 import torch
 import argparse
 import pytorch_lightning as pl
@@ -19,14 +20,6 @@ class GPT2FineTuneQAModelCheckpoint:
                                          filename=args.filename,
                                          save_last=args.save_last)
 class WenzhongQALitModel(pl.LightningModule):
-
-    @staticmethod
-    def add_model_specific_args(parent_args):
-        parser = parent_args.add_argument_group('BaseModel')
-        parser.add_argument('--learning_rate', default=1e-4, type=float)
-        parser.add_argument('--weight_decay', default=0.1, type=float)
-        parser.add_argument('--warmup', default=0.01, type=float)
-        return parent_args
 
     def __init__(self, args,model, num_data):
         super().__init__()
@@ -87,6 +80,10 @@ class WenzhongQALitModel(pl.LightningModule):
         # acc = self.comput_metrix(output.logits, batch['labels'])
         self.log('val_loss', output.loss,on_epoch=True,prog_bar=True,logger=True)
         # self.log('val_acc', acc)
+
+    def generate(self, x):
+        output = self.model(**x)
+        return output
 
     def configure_optimizers(self):
         no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']

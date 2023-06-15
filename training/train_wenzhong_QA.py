@@ -97,6 +97,7 @@ def main():
                         logger = logger)
 
     #trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
+    
 
     trainer.fit(gpt2_litmodel, datamodule=data)
 

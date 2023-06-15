@@ -40,3 +40,6 @@ ckpt:
   dirpath: '/autodl_tmp/ckpt'
   save_last: True
   file_name: 'Default'
+
+test:
+  ckpt_path: '/Users/sunlin/Documents/workdir/situationAwareness_0528/kg_trainer/files/rename.ckpt/final.ckpt'
