@@ -6,7 +6,7 @@ import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.utilities import rank_zero_info, rank_zero_only
 import torch
-
+from pytorch_lightning.callbacks import ModelCheckpoint
 import os
 #os.chdir('/home/seafood/wkdir/kg_trainer')
 
@@ -54,8 +54,10 @@ def main():
 
 
     if hp.gpt2.load_checkpoint :
+        print("Loading Checkpoint ...")
         gpt2_litmodel = gpt2_litmodel.load_from_checkpoint(hp.litmodel.load_checkpoint, args=hp, model=gpt2_model)
     else:
+        print("Loading Pretrained Model ...")
         gpt2_litmodel = gpt2_litmodel(args=hp.gpt2, model=gpt2_model,num_data=len(data.train_dataloader()))
 
     # Call baks
@@ -64,17 +66,19 @@ def main():
     logger = pl.loggers.WandbLogger(project='BASAer',name=args.model_name,save_dir=log_dir)
     experiment_dir = logger.log_dir
 
-    goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
+    #goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
     filename_format = "epoch={epoch:04d}-validation.loss={val_loss:.3f}"
-    checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        save_top_k=5,
-        filename=filename_format,
-        monitor=goldstar_metric,
-        mode="min",
-        auto_insert_metric_name=False,
-        dirpath=experiment_dir,
-        every_n_epochs=hp.trainer.chkpt_every_n_epochs,
-    )
+    hp.ckpt.file_name = filename_format
+    arg = hp.ckpt
+    hp.ckpt.dirpath = hp.ckpt.dirpath+'/'+args.model_name
+    checkpoint_callback = ModelCheckpoint(monitor=arg.monitor,
+                                         save_top_k=arg.save_top_k,
+                                         mode=arg.mode,
+                                         every_n_train_steps=arg.every_n_train_steps,
+                                         save_weights_only=arg.save_weights_only,
+                                         dirpath=arg.dirpath,
+                                         filename=arg.file_name,
+                                         save_last=arg.save_last)
 
     summary_callback = pl.callbacks.ModelSummary(max_depth=2)
 
@@ -88,11 +92,14 @@ def main():
     trainer = pl.Trainer(devices=hp.trainer.devices,accelerator=hp.trainer.accelerator,
                         max_epochs=hp.trainer.max_epochs,
                         strategy=hp.trainer.strategy,
+                        precision=hp.trainer.fp,
+                        accumulate_grad_batches=hp.trainer.gas,
                         #strategy=NLPDDPStrategy(),
                         callbacks=callbacks,
                         logger = logger)
 
     #trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
+    
 
     trainer.fit(gpt2_litmodel, datamodule=data)
 

@@ -4,13 +4,15 @@ trainer:
   devices: 4
   strategy: 'deepspeed_stage_3'
   accelerator: 'gpu'
+  fp: 16
+  gas: 8
 
 data:
   data_class: 'WenzhongQADataModel'
   data_class_module: "training.data_loader"
-  data_path: 'files/dataset/wyl'
-  max_seq_length: 1024
-  train_batchsize: 8
+  data_path: '/root/autodl-tmp/dataset'
+  max_seq_length: 512
+  train_batchsize: 2
   valid_batchsize: 2
   do_eval_only: False
   n_ctx: 1024
@@ -19,12 +21,12 @@ data:
   data_type_name: 'JSON'
 
 tokenizer:
-  tokenizer_path: 'IDEA-CCNL/Wenzhong-GPT2-110M'
-  #tokenizer_path: 'IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese'
+  #tokenizer_path: 'IDEA-CCNL/Wenzhong-GPT2-110M'
+  tokenizer_path: 'IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese'
 
 gpt2:
-  pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
-  #pretrained_file: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
+  #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
+  pretrained_file: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
   load_checkpoint: False
   lr: 0.0001
   weight_decay: 0.1
@@ -33,13 +35,13 @@ gpt2:
 
 ckpt:
   monitor: 'train_loss'
-  save_top_k: 3
+  save_top_k: 1
   mode: 'min'
   every_n_train_steps: 100
   save_weights_only: True
-  dirpath: '/autodl_tmp/ckpt'
+  dirpath: '/root/autodl-tmp/ckpt'
   save_last: True
   file_name: 'Default'
 
 test:
-  ckpt_path: '/Users/sunlin/Documents/workdir/situationAwareness_0528/kg_trainer/files/rename.ckpt/final.ckpt'
+  ckpt_path: '/root/autodl-tmp/ckpt/test_0.01.pt'
