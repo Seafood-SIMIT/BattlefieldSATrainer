@@ -8,9 +8,8 @@ trainer:
   gas: 8
 
 data:
-  data_class: 'WenzhongQADataModel'
-  data_class_module: "training.data_loader"
-  data_path: '/root/autodl-tmp/dataset'
+  data_dir: '/root/autodl-tmp/dataset'
+  raw_file_type: 'json'
   max_seq_length: 512
   train_batchsize: 2
   valid_batchsize: 2
@@ -18,7 +17,6 @@ data:
   n_ctx: 1024
   stride: 678
   num_workers: 16
-  data_type_name: 'JSON'
 
 tokenizer:
   #tokenizer_path: 'IDEA-CCNL/Wenzhong-GPT2-110M'

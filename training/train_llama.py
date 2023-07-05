@@ -16,9 +16,9 @@ sys.path.append('.')
 from utils import HParam
 from kg_generator import *
 from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel
-from llama_model import llamaModelGenerate
+from llama_model import llamaModelGenerate, LlamaModule
 from training.util import import_class, setup_data_from_args
-from training.data_loader import WenzhongQADataModel
+from training.data_loader import WYLLamaDataModule, WYLCOllator
 #import nemo
 #from nemo.collections.nlp.parts.nlp_overrides import NLPDDPStrategy
 
@@ -49,12 +49,13 @@ def main():
 
     model,tokenizer = llamaModelGenerate(hp.llama,hp.lora)
     #data
-    data = WenzhongQADataModel(hp.data,tokenizer)
+    collate_fn = WYLCOllator(tokenizer)
+    data = WYLLamaDataModule(tokenizer, collate_fn,hp.data)
 
-    gpt2_litmodel = WenzhongQALitModel
+    gpt2_litmodel = LlamaModule
 
 
-    gpt2_litmodel = gpt2_litmodel(args=hp.llama, model=model,num_data=len(data.train_dataloader()))
+    gpt2_litmodel = gpt2_litmodel(args=hp.llama, model=model,tokenizer=tokenizer)
 
     # Call baks
     log_dir = Path("training") / "logs"

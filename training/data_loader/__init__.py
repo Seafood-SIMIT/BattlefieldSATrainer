@@ -8,3 +8,4 @@ from .pure_yuliao import PUREYULIAO
 from .whole_yuliao import WHOLEYULIAO 
 from .test_yuliao import KGYULIAO
 from .saQADataset import WenzhongQADataModel
+from .llama_dataset import WYLCOllator, WYLLamaDataModule

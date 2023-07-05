@@ -1,19 +1,13 @@
 import torch
 import pytorch_lightning as pl
 from transformers.optimization import get_linear_schedule_with_warmup
+from .llama_generate import generate
 
-class Llama(pl.LightningModule):
-    @staticmethod
-    def add_module_specific_args(parent_parser):
-        parser = parent_parser.add_argument_group('ziya_llama finetune')
-        parser.add_argument('--max_seq_length', type=int, default=1024)
-        parser.add_argument('--model_parallel_size', type=int, default=1)
-        parser.add_argument('--tokenizer_path', default=None, type=str)
-        return parent_parser
-
-    def __init__(self, args, tokenizer):
+class LlamaModule(pl.LightningModule):
+    def __init__(self, args,model, tokenizer):
         super().__init__()
-        self.save_hyperparameters(args)
+        self.args_litmodel = args
+        self.model = model
         self.tokenizer = tokenizer
 
     def setup(self, stage) -> None:
