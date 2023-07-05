@@ -1,7 +1,6 @@
 """Base Dataset class."""
 from typing import Any, Callable, Dict, Sequence, Tuple, Union
 
-from PIL import Image
 import torch
 
 
@@ -92,9 +91,3 @@ def split_dataset(base_dataset: BaseDataset, fraction: float, seed: int) -> Tupl
         base_dataset, [split_a_size, split_b_size], generator=torch.Generator().manual_seed(seed)
     )
 
-
-def resize_image(image: Image.Image, scale_factor: int) -> Image.Image:
-    """Resize image by scale factor."""
-    if scale_factor == 1:
-        return image
-    return image.resize((image.width // scale_factor, image.height // scale_factor), resample=Image.BILINEAR)
