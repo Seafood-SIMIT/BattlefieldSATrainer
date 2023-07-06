@@ -49,6 +49,7 @@ class WYLLamaDataModule(pl.LightningDataModule):
         self.train_dataset = load_dataset(args_data.raw_file_type, data_dir = args_data.data_dir, data_files='train.json')
         self.valid_dataset = load_dataset(args_data.raw_file_type, data_dir = args_data.data_dir, data_files='valid.json')
 
+        self.args_data = args_data
         self.tokenizer = tokenizer
         self.collate_fn  = collate_fn
 
@@ -56,7 +57,7 @@ class WYLLamaDataModule(pl.LightningDataModule):
         return
 
     def train_dataloader(self):
-        ds = self.train_datasets
+        ds = self.train_dataset
 
         collate_fn = self.collate_fn
         if hasattr(ds, 'collate_fn'):
@@ -70,7 +71,7 @@ class WYLLamaDataModule(pl.LightningDataModule):
         )
 
     def val_dataloader(self):
-        ds = self.valid_datasets
+        ds = self.valid_dataset
         collate_fn = self.collate_fn
         if hasattr(ds, 'collate_fn'):
             collate_fn = ds.collate_fn
@@ -88,7 +89,7 @@ class WYLLamaDataModule(pl.LightningDataModule):
         # )
 
     def test_dataloader(self):
-        ds = self.valid_datasets
+        ds = self.valid_dataset
         collate_fn = self.collate_fn
         if hasattr(ds, 'collate_fn'):
             collate_fn = ds.collate_fn

@@ -9,6 +9,7 @@ class LlamaModule(pl.LightningModule):
         self.args_litmodel = args
         self.model = model
         self.tokenizer = tokenizer
+        self.num_data = 1024
 
     def setup(self, stage) -> None:
         self.total_step = int(self.trainer.max_epochs * self.num_data
@@ -17,21 +18,21 @@ class LlamaModule(pl.LightningModule):
 
 
     def configure_optimizers(self):
-        no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
+        no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight', 'layer_norm.', 'layernorm.']
         paras = list(
             filter(lambda p: p[1].requires_grad, self.named_parameters()))
         paras = [{
             'params':
             [p for n, p in paras if not any(nd in n for nd in no_decay)],
-            'weight_decay': self.args.weight_decay
+            'weight_decay': self.args_litmodel.weight_decay
         }, {
             'params': [p for n, p in paras if any(nd in n for nd in no_decay)],
             'weight_decay': 0.0
         }]
-        optimizer = torch.optim.AdamW(paras, lr=self.args.learning_rate)
+        optimizer = torch.optim.AdamW(paras, lr=self.args_litmodel.learning_rate)
         #optimizer = deepspeed.ops.adam.DeepSpeedCPUAdam(paras, lr=self.args.learning_rate)
         scheduler = get_linear_schedule_with_warmup(
-            optimizer, int(self.total_step * self.args.warmup),
+            optimizer, int(self.total_step * self.args_litmodel.warmup),
             self.total_step)
 
         return [{

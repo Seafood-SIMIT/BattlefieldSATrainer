@@ -16,7 +16,7 @@ data:
   do_eval_only: False
   n_ctx: 1024
   stride: 678
-  num_workers: 16
+  num_workers: 0
 
 tokenizer:
   #tokenizer_path: 'IDEA-CCNL/Wenzhong-GPT2-110M'
