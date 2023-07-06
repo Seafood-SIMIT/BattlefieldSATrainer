@@ -20,10 +20,10 @@ class WYLCOllator:
             r_qb = item['时刻']+';'+item['中立情报']+';'+item['获取情报']+';'+item['我方情报']+';'
             r_sa = item['态势描述']
 
-            prompt_input_ids = self.tokenizer(r_qb, add_spectial_tokens=False).input_ids
-            output_ids = self.tokenizer(r_sa, add_spectial_tokens=False).input_ids+[self.tokenizer.eos_token_id]
+            prompt_input_ids = self.tokenizer(r_qb, add_special_tokens=False).input_ids
+            output_ids = self.tokenizer(r_sa, add_special_tokens=False).input_ids+[self.tokenizer.eos_token_id]
 
-            max_length = min(max(len(prompt_input_ids), max_length), self.max_seq_length)
+            max_length = min(max(len(prompt_input_ids), max_length), 1024)
             input_ids_list.append(prompt_input_ids)
             labels_list.append(output_ids)
 
@@ -38,7 +38,7 @@ class WYLCOllator:
         }
         return model_inputs
 
-    def pad(ids, pad_id, max_length):
+    def pad(self,ids, pad_id, max_length):
         if len(ids) > max_length:
             return ids[:max_length]
         return ids + [pad_id] * (max_length - len(ids))
@@ -46,8 +46,9 @@ class WYLCOllator:
 class WYLLamaDataModule(pl.LightningDataModule):
     def __init__(self, tokenizer, collate_fn, args_data):
         super().__init__()
-        self.train_dataset = load_dataset(args_data.raw_file_type, data_dir = args_data.data_dir, data_files='train.json')
-        self.valid_dataset = load_dataset(args_data.raw_file_type, data_dir = args_data.data_dir, data_files='valid.json')
+        self.datasets = load_dataset(args_data.raw_file_type, data_dir = args_data.data_dir, data_files={'train':'train.json',
+                                                                                                        'valid':'valid.json',
+                                                                                                        'test':'valid.json'})
 
         self.args_data = args_data
         self.tokenizer = tokenizer
@@ -57,7 +58,7 @@ class WYLLamaDataModule(pl.LightningDataModule):
         return
 
     def train_dataloader(self):
-        ds = self.train_dataset
+        ds = self.datasets['train']
 
         collate_fn = self.collate_fn
         if hasattr(ds, 'collate_fn'):
@@ -71,7 +72,7 @@ class WYLLamaDataModule(pl.LightningDataModule):
         )
 
     def val_dataloader(self):
-        ds = self.valid_dataset
+        ds = self.datasets['valid']
         collate_fn = self.collate_fn
         if hasattr(ds, 'collate_fn'):
             collate_fn = ds.collate_fn
@@ -89,7 +90,7 @@ class WYLLamaDataModule(pl.LightningDataModule):
         # )
 
     def test_dataloader(self):
-        ds = self.valid_dataset
+        ds = self.datasets['valid']
         collate_fn = self.collate_fn
         if hasattr(ds, 'collate_fn'):
             collate_fn = ds.collate_fn

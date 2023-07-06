@@ -2,7 +2,7 @@ import torch
 import pytorch_lightning as pl
 from transformers.optimization import get_linear_schedule_with_warmup
 from .llama_generate import generate
-
+SHOW_DATA=False
 class LlamaModule(pl.LightningModule):
     def __init__(self, args,model, tokenizer):
         super().__init__()
