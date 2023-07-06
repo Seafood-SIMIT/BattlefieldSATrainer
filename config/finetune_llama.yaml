@@ -3,12 +3,14 @@ trainer:
   max_epochs: 200
   devices: 1
   strategy: 'deepspeed_stage_3'
-  accelerator: 'gpu'
+  accelerator: 'mps'
   fp: 16
   gas: 8
+  debug_mode: True
 
 data:
-  data_dir: '/root/autodl-tmp/dataset'
+  #data_dir: '/root/autodl-tmp/dataset'
+  data_dir: 'files/dataset/'
   raw_file_type: 'json'
   max_seq_length: 512
   train_batchsize: 2
@@ -18,14 +20,11 @@ data:
   stride: 678
   num_workers: 0
 
-tokenizer:
-  #tokenizer_path: 'IDEA-CCNL/Wenzhong-GPT2-110M'
-  tokenizer_path: 'IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese'
-
 llama:
   #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   base_model: "openlmlab/open-chinese-llama-7b-patch" 
-  cache_dir: '/root/autodl-tmp/llama_openlmlab'
+  #cache_dir: '/root/autodl-tmp/llama_openlmlab'
+  cache_dir: '/Volumes/T7/FileBackup/lora_model/llama_opemlmlab'
   load_checkpoint: False
   lr: 0.0001
   weight_decay: 0.1

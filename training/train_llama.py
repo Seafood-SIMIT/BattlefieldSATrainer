@@ -86,6 +86,9 @@ def main():
         )
         callbacks.append(early_stopping_callback)
 
+    if hp.trainer.debug_mode:
+        callbacks = []
+
     trainer = pl.Trainer(devices=hp.trainer.devices,accelerator=hp.trainer.accelerator,
                         max_epochs=hp.trainer.max_epochs,
                         #strategy=hp.trainer.strategy,
