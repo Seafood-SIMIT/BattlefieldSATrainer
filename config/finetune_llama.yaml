@@ -6,7 +6,7 @@ trainer:
   accelerator: 'gpu'
   fp: 16
   gas: 8
-  debug_mode: True
+  debug_mode: False
 
 data:
   data_dir: '/root/autodl-tmp/dataset'
