@@ -74,7 +74,7 @@ class LlamaModule(pl.LightningModule):
                 print('mask: {}'.format(batch['attention_mask'][0]))
                 print('position_ids: {}'.format(batch['position_ids'][0]))
         output = self(**batch)
-        self.log('train/loss', output.loss, sync_dist=True)
+        self.log('train_loss', output.loss, sync_dist=True)
         return output.loss
 
     def validation_step(self, batch, batch_idx):

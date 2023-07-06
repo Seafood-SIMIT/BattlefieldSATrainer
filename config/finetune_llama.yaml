@@ -12,7 +12,7 @@ data:
   data_dir: '/root/autodl-tmp/dataset'
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
-  max_seq_length: 512
+  max_seq_length: 1024
   train_batchsize: 8
   valid_batchsize: 2
   do_eval_only: False

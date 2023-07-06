@@ -18,7 +18,7 @@ from kg_generator import *
 from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel
 from llama_model import llamaModelGenerate, LlamaModule
 from training.util import import_class, setup_data_from_args
-from training.data_loader import WYLLamaDataModule, WYLCOllator
+from training.data_loader import WYLLamaDataModule, WYLCOllator, WenzhongQADataModel
 #import nemo
 #from nemo.collections.nlp.parts.nlp_overrides import NLPDDPStrategy
 
@@ -49,9 +49,9 @@ def main():
 
     model,tokenizer = llamaModelGenerate(hp.llama,hp.lora)
     #data
-    collate_fn = WYLCOllator(tokenizer)
+    collate_fn = WYLCOllator(tokenizer,hp.data.max_seq_length)
     data = WYLLamaDataModule(tokenizer, collate_fn,hp.data)
-
+    #data = WenzhongQADataModel(hp.data, tokenizer)
     gpt2_litmodel = LlamaModule
 
 
