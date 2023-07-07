@@ -46,6 +46,7 @@ def main():
 
     args = parser.parse_args()
     hp = HParam(args.config)
+    hp.llama.train_batchsize = hp.data.train_batchsize
 
     model,tokenizer = llamaModelGenerate(hp.llama,hp.lora)
     #data

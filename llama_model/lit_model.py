@@ -12,8 +12,15 @@ class LlamaModule(pl.LightningModule):
         self.num_data = num_data
 
     def setup(self, stage) -> None:
-        self.total_step = int(self.trainer.max_epochs * self.num_data
-                                  / self.trainer.accumulate_grad_batches)
+        train_loader = self.trainer._data_connector._train_dataloader_source.dataloader()
+        if self.trainer.max_epochs > 0:
+            world_size = self.trainer.world_size
+            tb_size = self.train_batch_size * max(1, world_size)
+            ab_size = self.trainer.accumulate_grad_batches
+            self.total_step = (len(train_loader.dataset) *
+                       self.trainer.max_epochs // tb_size) // ab_size
+        else:
+            self.total_step = self.trainer.max_steps
         print('Total training step:', self.total_step)
 
 

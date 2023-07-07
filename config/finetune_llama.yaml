@@ -23,13 +23,13 @@ data:
 llama:
   #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   base_model: "openlmlab/open-chinese-llama-7b-patch" 
+  train_batchsize: 2
   cache_dir: '/root/autodl-tmp/llama_openlmlab'
   #cache_dir: '/Volumes/T7/FileBackup/lora_model/llama_opemlmlab'
   load_checkpoint: True
   ckpt_dir: '/root/autodl-tmp/ckpt/20230707_llam_whole/last.ckpt'
-  lr: 0.0001
-  weight_decay: 0.1
-  learning_rate: 0.0001
+  weight_decay: 0.00001
+  learning_rate: 0.0003
   warmup: 0.01
 lora:
   lora_r: 8

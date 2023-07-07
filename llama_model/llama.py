@@ -18,7 +18,7 @@ def llamaModelGenerate(args_llama,args_lora):
     return loraTheModel(model,args_lora), tokenizer
 
 def loraTheModel(model,args_lora):
-    model = prepare_model_for_int8_training(model)
+    #model = prepare_model_for_int8_training(model)
     config = LoraConfig(
         r=args_lora.lora_r,
         lora_alpha=args_lora.lora_alpha,
