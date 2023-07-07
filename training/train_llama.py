@@ -54,8 +54,12 @@ def main():
     #data = WenzhongQADataModel(hp.data, tokenizer)
     gpt2_litmodel = LlamaModule
 
-
-    gpt2_litmodel = gpt2_litmodel(args=hp.llama, model=model,tokenizer=tokenizer)
+    if hp.llama.load_checkpoint == 'True':
+        print('load from checkpoint')
+        gpt2_litmodel = gpt2_litmodel.load_from_checkpoint(hp.llama.ckpt_path, args=hp.llama, model=model,tokenizer=tokenizer)
+    else:
+        print('load from hugging face')
+        gpt2_litmodel = gpt2_litmodel(args=hp.llama, model=model,tokenizer=tokenizer)
 
     # Call baks
     log_dir = Path("training") / "logs"

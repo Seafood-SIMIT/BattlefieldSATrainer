@@ -10,12 +10,11 @@ from transformers import LlamaTokenizer, LlamaForCausalLM
 def llamaModelGenerate(args_llama,args_lora):
     model = LlamaForCausalLM.from_pretrained(
     args_llama.base_model,
-    load_in_8bit=True,
-    torch_dtype=torch.float16,
+    torch_dtype=torch.half,
     cache_dir = args_llama.cache_dir,
 )
  
-    tokenizer = LlamaTokenizer.from_pretrained(args_llama.base_model)
+    tokenizer = LlamaTokenizer.from_pretrained(args_llama.base_model,cache_dir = args_llama.cache_dir)
     return loraTheModel(model,args_lora), tokenizer
 
 def loraTheModel(model,args_lora):

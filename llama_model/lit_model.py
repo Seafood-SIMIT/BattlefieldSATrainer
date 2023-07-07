@@ -4,12 +4,12 @@ from transformers.optimization import get_linear_schedule_with_warmup
 from .llama_generate import generate
 SHOW_DATA=False
 class LlamaModule(pl.LightningModule):
-    def __init__(self, args,model, tokenizer):
+    def __init__(self, args,model, tokenizer,num_data):
         super().__init__()
         self.args_litmodel = args
         self.model = model
         self.tokenizer = tokenizer
-        self.num_data = 1024
+        self.num_data = num_data
 
     def setup(self, stage) -> None:
         self.total_step = int(self.trainer.max_epochs * self.num_data
@@ -74,12 +74,12 @@ class LlamaModule(pl.LightningModule):
                 print('mask: {}'.format(batch['attention_mask'][0]))
                 print('position_ids: {}'.format(batch['position_ids'][0]))
         output = self(**batch)
-        self.log('train_loss', output.loss, sync_dist=True)
+        self.log('train_loss', output.loss, on_epoch=True, prog_bar=True,logger=True)
         return output.loss
 
     def validation_step(self, batch, batch_idx):
         output = self(**batch)
-        self.log('val_loss', output.loss, sync_dist=True)
+        self.log('val_loss', output.loss, on_epoch=True, prog_bar=True,logger=True)
         return output.loss
 
     def predict_step(self, batch, batch_idx):

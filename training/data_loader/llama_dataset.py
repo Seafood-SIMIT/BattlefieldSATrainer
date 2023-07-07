@@ -5,39 +5,59 @@ from datasets import load_dataset
 from torch.utils.data import DataLoader
 from typing import Optional
 
+def pad(ids, pad_id, max_length):
+    if len(ids) > max_length:
+        return ids[:max_length]
+    return ids + [pad_id] * (max_length - len(ids))
+
+
+prompt_prefix = ""
+prompt_without_output = "<human>:{prompt}\n<bot>:"
+
 @dataclass
 class WYLCOllator:
-    tokenizer: None
-    #args_data: None
-    max_seq_length: 1024
-    def __call__(self,samples):
+    '''
+    由input处理成samples，也就是最终模型的输入
+    其中主要处理逻辑在__call__里
+    '''
+    tokenizer: None  # 分词
+    max_seq_length: 1536
+    def __call__(self, samples):
         input_ids_list = []
-        input_attention_mask = []
         labels_list = []
         max_length = 0
-        self.tokenizer.add_special_tokens({'pad_token': '<|endoftext|>'})
-            
-        for item in samples:
+        for s in samples:
             """
-            Samples: ['时刻', '获取情报', '中立情报', '我方情报', '态势描述'],
+            sample: {
+                "task" : str,
+                "prompt": [str]
+                "output": [str]
+                }
             """
-            r_qb = item['时刻']+';'+item['中立情报']+';'+item['获取情报']+';'+item['我方情报']+';'
-            r_sa = item['态势描述'].strip()
-
-            prompt_input_ids = self.tokenizer(r_qb, add_special_tokens=False).input_ids
-            output_ids = self.tokenizer(r_sa, add_special_tokens=True).input_ids
+            prompt_cnt = min(len(s["prompt"]), len(s["output"]))
+            # input_ids = self.tokenizer(prompt_prefix).input_ids
+            input_ids = []
+            labels_ids = [-100] * len(input_ids)
+            for i in range(prompt_cnt):
+                prompt_input_ids = self.tokenizer(prompt_without_output.format_map(
+                    {"prompt": s["prompt"][i].strip()}), add_special_tokens=False).input_ids
+                output_ids = self.tokenizer(s["output"][i].strip(), add_special_tokens=False).input_ids + [self.tokenizer.eos_token_id]
+                
+                input_ids += prompt_input_ids
+                input_ids += output_ids
+                
+                labels_ids += [-100] * (len(prompt_input_ids)) + output_ids
             
-            input_ids = prompt_input_ids + output_ids
-            labels_ids = [-100]*(len(prompt_input_ids)) + output_ids
+            # input_ids += [self.tokenizer.eos_token_id]
+            # labels_ids += [self.tokenizer.eos_token_id]
             max_length = min(max(len(input_ids), max_length), self.max_seq_length)
-            
             input_ids_list.append(input_ids)
             labels_list.append(labels_ids)
-        
+
         # PAD
         for i in range(len(input_ids_list)):
-            labels_list[i] = self.pad(labels_list[i], -100, max_length)
-            input_ids_list[i] = self.pad(input_ids_list[i], self.tokenizer.eos_token_id, max_length)
+            labels_list[i] = pad(labels_list[i], -100, max_length)
+            input_ids_list[i] = pad(input_ids_list[i], self.tokenizer.eos_token_id, max_length)
         model_inputs = {
             'input_ids': torch.tensor(input_ids_list).clone(),
             'attention_mask': torch.ones((len(input_ids_list), max_length)).clone(),
@@ -46,10 +66,6 @@ class WYLCOllator:
         }
         return model_inputs
 
-    def pad(self,ids, pad_id, max_length):
-        if len(ids) > max_length:
-            return ids[:max_length]
-        return ids + [pad_id] * (max_length - len(ids))
     
 class WYLLamaDataModule(pl.LightningDataModule):
     def __init__(self, tokenizer, collate_fn, args_data):
