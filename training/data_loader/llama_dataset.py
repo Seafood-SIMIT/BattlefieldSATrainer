@@ -20,7 +20,8 @@ class LlamaDataset(Dataset):
         self.max_seq_length = args.max_seq_length
         #self.max_seq_length =-1
         if self.tokenizer.pad_token is None:
-            self.tokenizer.add_special_tokens({'pad_token': '-1'})
+            #self.tokenizer.add_special_tokens({'pad_token': '-1'})
+            self.tokenizer.add_special_tokens({'pad_token': '<|endoftext|>'})
         self.add_special_tokens = add_special_tokens
 
     def __len__(self):
