@@ -18,7 +18,7 @@ from kg_generator import *
 from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel
 from llama_model import llamaModelGenerate, LlamaModule
 from training.util import import_class, setup_data_from_args
-from training.data_loader import WYLLamaDataModule, WYLCOllator, WenzhongQADataModel
+from training.data_loader import WYLLamaDataModule
 #import nemo
 #from nemo.collections.nlp.parts.nlp_overrides import NLPDDPStrategy
 
@@ -50,8 +50,7 @@ def main():
 
     model,tokenizer = llamaModelGenerate(hp.llama,hp.lora)
     #data
-    collate_fn = WYLCOllator(tokenizer,hp.data.max_seq_length)
-    data = WYLLamaDataModule(tokenizer, collate_fn,hp.data)
+    data = WYLLamaDataModule(tokenizer, hp.data)
     #data = WenzhongQADataModel(hp.data, tokenizer)
     gpt2_litmodel = LlamaModule
 
@@ -63,7 +62,7 @@ def main():
         gpt2_litmodel = gpt2_litmodel(args=hp.llama, model=model,tokenizer=tokenizer)
 
     # Call baks
-    log_dir = Path("training") / "logs"
+    log_dir = '/root/autodl-tmp/logs'
     _ensure_logging_dir(log_dir)
     logger = pl.loggers.WandbLogger(project='BASAer',name=args.model_name,save_dir=log_dir)
     experiment_dir = logger.log_dir

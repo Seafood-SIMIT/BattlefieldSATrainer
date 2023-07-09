@@ -4,18 +4,17 @@ from transformers.optimization import get_linear_schedule_with_warmup
 from .llama_generate import generate
 SHOW_DATA=False
 class LlamaModule(pl.LightningModule):
-    def __init__(self, args,model, tokenizer,num_data):
+    def __init__(self, args,model, tokenizer):
         super().__init__()
         self.args_litmodel = args
         self.model = model
         self.tokenizer = tokenizer
-        self.num_data = num_data
 
     def setup(self, stage) -> None:
         train_loader = self.trainer.datamodule.train_dataloader()
         if self.trainer.max_epochs > 0:
             world_size = self.trainer.world_size
-            tb_size = self.train_batch_size * max(1, world_size)
+            tb_size = self.args_litmodel.train_batchsize * max(1, world_size)
             ab_size = self.trainer.accumulate_grad_batches
             self.total_step = (len(train_loader.dataset) *
                        self.trainer.max_epochs // tb_size) // ab_size
@@ -52,6 +51,7 @@ class LlamaModule(pl.LightningModule):
         }]
 
     def forward(self, **batch):
+        #print(batch)
         return self.model(**batch)
 
     def detokenize(self, token_ids):
@@ -79,7 +79,7 @@ class LlamaModule(pl.LightningModule):
                 print('target: {}'.format(self.detokenize(
                     batch['labels'][0][label_idx])))
                 print('mask: {}'.format(batch['attention_mask'][0]))
-                print('position_ids: {}'.format(batch['position_ids'][0]))
+                #print('position_ids: {}'.format(batch['position_ids'][0]))
         output = self(**batch)
         self.log('train_loss', output.loss, on_epoch=True, prog_bar=True,logger=True)
         return output.loss
