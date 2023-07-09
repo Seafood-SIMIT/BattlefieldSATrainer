@@ -12,7 +12,7 @@ class LlamaModule(pl.LightningModule):
         self.num_data = num_data
 
     def setup(self, stage) -> None:
-        train_loader = self.trainer._data_connector._train_dataloader_source.dataloader()
+        train_loader = self.trainer.datamodule.train_dataloader()
         if self.trainer.max_epochs > 0:
             world_size = self.trainer.world_size
             tb_size = self.train_batch_size * max(1, world_size)
