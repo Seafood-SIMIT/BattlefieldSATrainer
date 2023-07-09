@@ -13,12 +13,13 @@ data:
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
   max_seq_length: 512
-  train_batchsize: 2
+  train_batchsize: 4
   valid_batchsize: 2
   do_eval_only: False
   n_ctx: 1024
   stride: 678
-  num_workers: 0
+  num_workers: 2
+  hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
 
 llama:
   #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
@@ -26,7 +27,7 @@ llama:
   train_batchsize: 2
   cache_dir: '/root/autodl-tmp/llama_openlmlab'
   #cache_dir: '/Volumes/T7/FileBackup/lora_model/llama_opemlmlab'
-  load_checkpoint: True
+  load_checkpoint: False
   ckpt_dir: '/root/autodl-tmp/ckpt/20230707_llam_whole/last.ckpt'
   weight_decay: 0.00001
   learning_rate: 0.0003
