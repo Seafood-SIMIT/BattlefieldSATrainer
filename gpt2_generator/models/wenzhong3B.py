@@ -7,7 +7,7 @@ from peft import (
 )
 from transformers import LlamaTokenizer, LlamaForCausalLM
 
-def wenzhongPeftGenerate(args_model,args_lora):
+def wenzhong3BPeftGenerate(args_model,args_lora):
     model = LlamaForCausalLM.from_pretrained(
     args_model.base_model,
     torch_dtype=torch.half,

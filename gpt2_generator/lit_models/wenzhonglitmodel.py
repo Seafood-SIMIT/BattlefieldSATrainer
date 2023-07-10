@@ -9,16 +9,6 @@ from pytorch_lightning import Trainer, loggers
 from transformers.optimization import get_linear_schedule_with_warmup
 from transformers import GPT2LMHeadModel
 
-class GPT2FineTuneQAModelCheckpoint:
-    def __init__(self, args):
-        self.callbacks = ModelCheckpoint(monitor=args.monitor,
-                                         save_top_k=args.save_top_k,
-                                         mode=args.mode,
-                                         every_n_train_steps=args.every_n_train_steps,
-                                         save_weights_only=args.save_weights_only,
-                                         dirpath=args.dirpath,
-                                         filename=args.filename,
-                                         save_last=args.save_last)
 class WenzhongQALitModel(pl.LightningModule):
 
     def __init__(self, args,model, num_data):
