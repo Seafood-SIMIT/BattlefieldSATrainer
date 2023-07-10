@@ -15,7 +15,10 @@ def wenzhong3BPeftGenerate(args_model,args_lora):
 )
  
     tokenizer = GPT2Tokenizer.from_pretrained(args_model.base_model,cache_dir = args_model.cache_dir)
-    return loraTheModel(model,args_lora), tokenizer
+    if args_model.use_lora:
+        return loraTheModel(model,args_lora), tokenizer
+    else:
+        return model, tokenizer
 
 def loraTheModel(model,args_lora):
     #model = prepare_model_for_int8_training(model)

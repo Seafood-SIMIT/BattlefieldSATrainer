@@ -1,7 +1,7 @@
 trainer:
   stop_early: False
   max_epochs: 200
-  devices: 1
+  devices: 2
   strategy: 'deepspeed_stage_3'
   accelerator: 'gpu'
   fp: 16
@@ -12,8 +12,8 @@ data:
   data_dir: '/root/autodl-tmp/dataset'
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
-  max_seq_length: 724
-  train_batchsize: 4
+  max_seq_length: 512
+  train_batchsize: 8
   valid_batchsize: 2
   do_eval_only: False
   n_ctx: 1024
@@ -26,14 +26,16 @@ model:
   #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   #base_model: "openlmlab/open-chinese-llama-7b-patch" 
   base_model: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
+  #base_model: 'IDEA-CCNL/Wenzhong-GPT2-110M'
   train_batchsize: 2
-  cache_dir: '/root/autodl-tmp/wenzhong'
+  cache_dir: '/root/.cache/huggingface/'
   #cache_dir: '/Volumes/T7/FileBackup/lora_model/llama_opemlmlab'
   load_checkpoint: False
   ckpt_dir: '/root/autodl-tmp/ckpt/20230707_llam_whole/last.ckpt'
   weight_decay: 0.00001
   learning_rate: 0.0003
   warmup: 0.01
+  use_lora: True
 lora:
   lora_r: 8
   lora_alpha: 16

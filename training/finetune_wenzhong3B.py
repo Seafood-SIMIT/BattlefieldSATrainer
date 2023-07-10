@@ -62,18 +62,23 @@ def main():
         print('load from hugging face')
         gpt2_litmodel = gpt2_litmodel(args=hp.model, model=model,tokenizer=tokenizer)
 
-    # Call baks
     log_dir = '/root/autodl-tmp/logs'
     _ensure_logging_dir(log_dir)
     logger = pl.loggers.WandbLogger(project='BASAer',name=args.model_name,save_dir=log_dir)
     experiment_dir = logger.log_dir
+        
+    if hp.trainer.debug_mode:
+        callbacks = []
+    else:
+        # Call baks
+        
 
-    #goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
-    filename_format = "epoch={epoch:04d}-validation.loss={val_loss:.3f}"
-    hp.ckpt.file_name = filename_format
-    arg = hp.ckpt
-    hp.ckpt.dirpath = hp.ckpt.dirpath+'/'+args.model_name
-    checkpoint_callback = ModelCheckpoint(monitor=arg.monitor,
+        #goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
+        filename_format = "epoch={epoch:04d}-validation.loss={val_loss:.3f}"
+        hp.ckpt.file_name = filename_format
+        arg = hp.ckpt
+        hp.ckpt.dirpath = hp.ckpt.dirpath+'/'+args.model_name
+        checkpoint_callback = ModelCheckpoint(monitor=arg.monitor,
                                          save_top_k=arg.save_top_k,
                                          mode=arg.mode,
                                          every_n_train_steps=arg.every_n_train_steps,
@@ -82,17 +87,14 @@ def main():
                                          filename=arg.file_name,
                                          save_last=arg.save_last)
 
-    summary_callback = pl.callbacks.ModelSummary(max_depth=2)
+        summary_callback = pl.callbacks.ModelSummary(max_depth=2)
 
-    callbacks = [summary_callback, checkpoint_callback]
-    if hp.trainer.stop_early:
-        early_stopping_callback = pl.callbacks.EarlyStopping(
+        callbacks = [summary_callback, checkpoint_callback]
+        if hp.trainer.stop_early:
+            early_stopping_callback = pl.callbacks.EarlyStopping(
             monitor="val_loss", mode="min", patience=args.stop_early
         )
-        callbacks.append(early_stopping_callback)
-
-    if hp.trainer.debug_mode:
-        callbacks = []
+            callbacks.append(early_stopping_callback)
 
     trainer = pl.Trainer(devices=hp.trainer.devices,accelerator=hp.trainer.accelerator,
                         max_epochs=hp.trainer.max_epochs,
