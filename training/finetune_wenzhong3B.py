@@ -15,9 +15,10 @@ sys.path.append('.')
 
 from utils import HParam
 from kg_generator import *
-from gpt2_generator import Wenzhong3BModule, Wenzhong3BQADataset,wenzhong3BPeftGenerate
+from gpt2_generator import Wenzhong3BModule, Wenzhong3BDataModule,wenzhong3BPeftGenerate
 from training.util import import_class, setup_data_from_args
-from training.data_loader import WYLLamaDataModule
+
+import pdb
 #import nemo
 #from nemo.collections.nlp.parts.nlp_overrides import NLPDDPStrategy
 
@@ -36,6 +37,7 @@ def _ensure_logging_dir(experiment_dir):
 
 
 def main():
+    __spec__ = "ModuleSpec(name='builtins', loader=<class '_frozen_importlib.BuiltinImporter'>)"
     parser = argparse.ArgumentParser(add_help=False)
 
 
@@ -47,18 +49,18 @@ def main():
     hp = HParam(args.config)
     hp.model.train_batchsize = hp.data.train_batchsize
 
-    model,tokenizer = wenzhong3BPeftGenerate(hp.llama,hp.lora)
+    model,tokenizer = wenzhong3BPeftGenerate(hp.model,hp.lora)
     #data
-    data = Wenzhong3BQADataset(tokenizer, hp.data)
+    data = Wenzhong3BDataModule(tokenizer, hp.data)
     #data = WenzhongQADataModel(hp.data, tokenizer)
     gpt2_litmodel = Wenzhong3BModule
 
-    if hp.llama.load_checkpoint == 'True':
+    if hp.model.load_checkpoint == 'True':
         print('load from checkpoint')
-        gpt2_litmodel = gpt2_litmodel.load_from_checkpoint(hp.llama.ckpt_path, args=hp.llama, model=model,tokenizer=tokenizer)
+        gpt2_litmodel = gpt2_litmodel.load_from_checkpoint(hp.model.ckpt_path, args=hp.model, model=model,tokenizer=tokenizer)
     else:
         print('load from hugging face')
-        gpt2_litmodel = gpt2_litmodel(args=hp.llama, model=model,tokenizer=tokenizer)
+        gpt2_litmodel = gpt2_litmodel(args=hp.model, model=model,tokenizer=tokenizer)
 
     # Call baks
     log_dir = '/root/autodl-tmp/logs'
@@ -103,7 +105,6 @@ def main():
 
     #trainer.tune(lit_model, datamodule=data)  # If passing --auto_lr_find, this will set learning rate
     
-
     trainer.fit(gpt2_litmodel, datamodule=data)
 
     best_model_path = checkpoint_callback.best_model_path

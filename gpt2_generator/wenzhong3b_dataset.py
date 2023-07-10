@@ -59,12 +59,13 @@ class Wenzhong3BQADataset(Dataset):
 class Wenzhong3BDataModule(pl.LightningDataModule):
     def __init__(self, tokenizer, args_data):
         super().__init__()
-        if args_data.hf_data == 'False':
+        if args_data.hf_data:
+            self.datasets = load_dataset(args_data.hf_data)
+        else:
             self.datasets = load_dataset(args_data.raw_file_type, data_dir = args_data.data_dir, data_files={'train':'train.json',
                                                                                                         'validation':'valid.json',
                                                                                                         })
-        else:
-            self.datasets = load_dataset(args_data.hf_data)
+            
         self.train_dataset = Wenzhong3BQADataset(args_data,tokenizer,self.datasets['train'])
         self.valid_dataset = Wenzhong3BQADataset(args_data,tokenizer,self.datasets['validation'])
         

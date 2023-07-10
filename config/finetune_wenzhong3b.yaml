@@ -12,7 +12,7 @@ data:
   data_dir: '/root/autodl-tmp/dataset'
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
-  max_seq_length: 512
+  max_seq_length: 724
   train_batchsize: 4
   valid_batchsize: 2
   do_eval_only: False
@@ -22,7 +22,7 @@ data:
   #hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
   hf_data: False
 
-llama:
+model:
   #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   #base_model: "openlmlab/open-chinese-llama-7b-patch" 
   base_model: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
@@ -39,8 +39,7 @@ lora:
   lora_alpha: 16
   lora_dropout: 0.05
   lora_target_modules: [
-    "q_proj",
-    "v_proj",
+    "c_attn",
 ]
 
 ckpt:

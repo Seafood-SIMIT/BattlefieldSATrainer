@@ -5,16 +5,16 @@ from peft import (
     get_peft_model_state_dict,
     prepare_model_for_int8_training,
 )
-from transformers import LlamaTokenizer, LlamaForCausalLM
+from transformers import GPT2LMHeadModel,GPT2Tokenizer
 
 def wenzhong3BPeftGenerate(args_model,args_lora):
-    model = LlamaForCausalLM.from_pretrained(
+    model = GPT2LMHeadModel.from_pretrained(
     args_model.base_model,
     torch_dtype=torch.half,
     cache_dir = args_model.cache_dir,
 )
  
-    tokenizer = LlamaTokenizer.from_pretrained(args_model.base_model,cache_dir = args_model.cache_dir)
+    tokenizer = GPT2Tokenizer.from_pretrained(args_model.base_model,cache_dir = args_model.cache_dir)
     return loraTheModel(model,args_lora), tokenizer
 
 def loraTheModel(model,args_lora):
