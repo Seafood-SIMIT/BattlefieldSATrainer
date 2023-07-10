@@ -12,8 +12,8 @@ data:
   data_dir: '/root/autodl-tmp/dataset'
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
-  max_seq_length: 512
-  train_batchsize: 8
+  max_seq_length: 4
+  train_batchsize: 2
   valid_batchsize: 2
   do_eval_only: False
   n_ctx: 1024
@@ -28,7 +28,8 @@ model:
   base_model: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
   #base_model: 'IDEA-CCNL/Wenzhong-GPT2-110M'
   train_batchsize: 2
-  cache_dir: '/root/.cache/huggingface/'
+  #cache_dir: '/root/.cache/huggingface/'
+  cache_dir: '/root/autodl-tmp/wenzhong/'
   #cache_dir: '/Volumes/T7/FileBackup/lora_model/llama_opemlmlab'
   load_checkpoint: False
   ckpt_dir: '/root/autodl-tmp/ckpt/20230707_llam_whole/last.ckpt'
