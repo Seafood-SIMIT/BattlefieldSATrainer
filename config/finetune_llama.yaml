@@ -15,7 +15,7 @@ data:
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
   max_seq_length: 512
-  train_batchsize: 4
+  train_batchsize: 2
   valid_batchsize: 2
   do_eval_only: False
   n_ctx: 1024
