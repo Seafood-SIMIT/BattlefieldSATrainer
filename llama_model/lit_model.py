@@ -1,6 +1,7 @@
 import torch
 import pytorch_lightning as pl
 from transformers.optimization import get_linear_schedule_with_warmup
+from transformers.optimization import AdamW
 from .llama_generate import generate
 SHOW_DATA=False
 class LlamaModule(pl.LightningModule):
@@ -29,26 +30,19 @@ class LlamaModule(pl.LightningModule):
             filter(lambda p: p[1].requires_grad, self.named_parameters()))
         paras = [{
             'params':
-            [p for n, p in paras if not any(nd in n for nd in no_decay)],
+            [p for n, p in self.named_parameters() if not any(nd in n for nd in no_decay)],
             'weight_decay': self.args_litmodel.weight_decay
         }, {
-            'params': [p for n, p in paras if any(nd in n for nd in no_decay)],
+            'params': [p for n, p in self.named_parameters() if any(nd in n for nd in no_decay)],
             'weight_decay': 0.0
         }]
-        optimizer = torch.optim.AdamW(paras, lr=self.args_litmodel.learning_rate)
-        #optimizer = deepspeed.ops.adam.DeepSpeedCPUAdam(paras, lr=self.args.learning_rate)
-        scheduler = get_linear_schedule_with_warmup(
-            optimizer, int(self.total_step * self.args_litmodel.warmup),
-            self.total_step)
+        optimizer = AdamW(paras, lr=self.args_litmodel.learning_rate,
+                          betas=(self.args_litmodel.adam_beta1, self.args_litmodel.adam_beta2),
+                          eps=self.args_litmodel.adam_epsilon)
 
-        return [{
+        return {
             'optimizer': optimizer,
-            'lr_scheduler': {
-                'scheduler': scheduler,
-                'interval': 'step',
-                'frequency': 1
-            }
-        }]
+        }
 
     def forward(self, **batch):
         #print(batch)
