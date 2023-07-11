@@ -67,6 +67,7 @@ def main():
     logger = pl.loggers.WandbLogger(project='BASAer',name=args.model_name,save_dir=log_dir)
     experiment_dir = logger.log_dir
         
+    print(hp.trainer.debug_mode == False)
     if hp.trainer.debug_mode:
         callbacks = []
     else:
