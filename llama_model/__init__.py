@@ -1,2 +1,2 @@
-from .llama import llamaModelGenerate
+from .llama import LlamaPeftGenerate
 from .lit_model import LlamaModule

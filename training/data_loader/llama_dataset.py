@@ -5,6 +5,11 @@ from datasets import load_dataset
 from torch.utils.data import DataLoader, Dataset
 from typing import Optional
 
+def pad(ids, pad_id, max_length):
+    if len(ids) > max_length:
+        return ids[:max_length]
+    return ids + [pad_id] * (max_length - len(ids))
+
 class LlamaDataset(Dataset):
     '''
     Dataset Used for yuyuan medical qa task.
@@ -19,9 +24,6 @@ class LlamaDataset(Dataset):
         self.data = data_set
         self.max_seq_length = args.max_seq_length
         #self.max_seq_length =-1
-        if self.tokenizer.pad_token is None:
-            #self.tokenizer.add_special_tokens({'pad_token': '-1'})
-            self.tokenizer.add_special_tokens({'pad_token': '<|endoftext|>'})
         self.add_special_tokens = add_special_tokens
 
     def __len__(self):
@@ -45,28 +47,30 @@ class LlamaDataset(Dataset):
         # conver to ids
         r_qb = item['prompt'][0]
         r_sa = item['output'][0]
-        inputs = self.tokenizer(
-                    r_qb+r_sa, add_special_tokens=self.add_special_tokens,max_length=self.max_seq_length, padding='max_length',
-                                                 truncation=True, return_tensors='pt')
-        input_ids = inputs["input_ids"]
-        attention_mask = inputs['attention_mask']
-        labels = input_ids.clone().detach()
-        context_length = len(self.tokenizer(
-            r_qb, add_special_tokens=self.add_special_tokens).input_ids)
-        #print(context_length, labels.shape)
-        labels[0,:context_length-1] = -100
-        return {"input_ids": input_ids.squeeze(), "attention_mask": attention_mask.squeeze(), "labels":  labels.squeeze()}
+        prompt_ids = self.tokenizer(r_qb, add_special_tokens = False).input_ids
+        output_ids =self.tokenizer(r_sa, add_special_tokens = False).input_ids 
+
+        labels_ids = [-100]*(len(prompt_ids)) + output_ids
+
+        max_length = self.max_seq_length
+        target_ids = pad(labels_ids, -100,max_length)
+        input_ids = pad(prompt_ids,self.tokenizer.eos_token_id, max_length)
+
+        return {"input_ids": torch.tensor(input_ids).clone().squeeze(),
+                 "attention_mask": torch.ones((len(input_ids), max_length)).clone(), 
+                 "position_ids": torch.arange(0, max_length).unsqueeze(0).expand(len(input_ids), max_length).clone(),
+                 "labels":  torch.tensor(target_ids).clone().squeeze()}
     
     
 class WYLLamaDataModule(pl.LightningDataModule):
     def __init__(self, tokenizer, args_data):
         super().__init__()
-        if args_data.hf_data == 'False':
+        if args_data.hf_data:
+            self.datasets = load_dataset(args_data.hf_data)
+        else:
             self.datasets = load_dataset(args_data.raw_file_type, data_dir = args_data.data_dir, data_files={'train':'train.json',
                                                                                                         'validation':'valid.json',
                                                                                                         })
-        else:
-            self.datasets = load_dataset(args_data.hf_data)
         self.train_dataset = LlamaDataset(args_data,tokenizer,self.datasets['train'])
         self.valid_dataset = LlamaDataset(args_data,tokenizer,self.datasets['validation'])
         

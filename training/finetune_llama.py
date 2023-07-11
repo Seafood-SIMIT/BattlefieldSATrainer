@@ -16,7 +16,7 @@ sys.path.append('.')
 from utils import HParam
 from kg_generator import *
 from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel
-from llama_model import llamaModelGenerate, LlamaModule
+from llama_model import LlamaPeftGenerate, LlamaModule
 from training.util import import_class, setup_data_from_args
 from training.data_loader import WYLLamaDataModule
 #import nemo
@@ -48,7 +48,7 @@ def main():
     hp = HParam(args.config)
     hp.llama.train_batchsize = hp.data.train_batchsize
 
-    model,tokenizer = llamaModelGenerate(hp.llama,hp.lora)
+    model,tokenizer = LlamaPeftGenerate(hp.llama,hp.lora)
     #data
     data = WYLLamaDataModule(tokenizer, hp.data)
     #data = WenzhongQADataModel(hp.data, tokenizer)

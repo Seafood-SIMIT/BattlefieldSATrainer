@@ -1,7 +1,7 @@
 trainer:
   stop_early: False
   max_epochs: 200
-  devices: 2
+  devices: 1
   strategy: 'deepspeed_stage_3'
   accelerator: 'gpu'
   fp: 16
