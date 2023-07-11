@@ -56,6 +56,11 @@ class LlamaDataset(Dataset):
         target_ids = pad(labels_ids, -100,max_length)
         input_ids = pad(prompt_ids,self.tokenizer.eos_token_id, max_length)
 
+        x = {"input_ids": torch.tensor(input_ids).unsqueeze(0).clone(),
+                 "attention_mask": torch.ones((1, max_length)).clone(), 
+                 "position_ids": torch.arange(0, max_length).unsqueeze(0).expand(1, max_length).clone(),
+                 "labels":  torch.tensor(target_ids).unsqueeze(0).clone()}
+        print(x['input_ids'].shape, x['attention_mask'].shape, x['position_ids'].shape, x['labels'].shape)
         return {"input_ids": torch.tensor(input_ids).clone().squeeze(),
                  "attention_mask": torch.ones((len(input_ids), max_length)).clone(), 
                  "position_ids": torch.arange(0, max_length).unsqueeze(0).expand(len(input_ids), max_length).clone(),
@@ -78,7 +83,8 @@ class WYLLamaDataModule(pl.LightningDataModule):
         self.tokenizer = tokenizer
 
     def setup(self, stage: Optional[str] = None) -> None:
-        return
+        for x in self.train_dataset:
+            return x
 
     def train_dataloader(self):
         ds = self.train_dataset
