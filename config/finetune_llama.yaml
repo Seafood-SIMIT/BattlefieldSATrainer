@@ -9,8 +9,8 @@ trainer:
   debug_mode: False
 
 data:
-  #hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
-  hf_data: False
+  hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
+  #hf_data: False
   data_dir: '/root/autodl-tmp/dataset'
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
@@ -25,7 +25,7 @@ data:
 
 llama:
   #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
-  #base_model: "openlmlab/open-chinese-llama-7b-patch" 
+  #base_model: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   #base_model: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
   base_model: 'IDEA-CCNL/Ziya-LLaMA-13B-v1.1'
   cache_dir: '/root/autodl-tmp/ziya'
@@ -36,17 +36,17 @@ llama:
   weight_decay: 0.1
   learning_rate: 0.0001
   warmup: 0.01
-lora:
-  lora_r: 8
-  lora_alpha: 16
-  lora_dropout: 0.05
-  lora_target_modules: [
-    "q_proj",
-    "v_proj",
-]
   adam_beta1: 0.9
   adam_beta2: 0.95
   adam_epsilon: 0.00000001
+  
+  
+lora:
+  lora_r: 8
+  lora_alpha: 64
+  lora_dropout: 0.1
+  lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "down_proj", "up_proj"]
+  
 
 ckpt:
   monitor: 'train_loss'

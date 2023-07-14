@@ -95,8 +95,8 @@ def main():
 
     trainer = pl.Trainer(devices=hp.trainer.devices,accelerator=hp.trainer.accelerator,
                         max_epochs=hp.trainer.max_epochs,
-                        #strategy=hp.trainer.strategy,
-                        #precision=hp.trainer.fp,
+                        strategy=hp.trainer.strategy,
+                        precision=hp.trainer.fp,
                         #accumulate_grad_batches=hp.trainer.gas,
                         #strategy=NLPDDPStrategy(),
                         callbacks=callbacks,
