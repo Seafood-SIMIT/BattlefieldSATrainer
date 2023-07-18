@@ -9,7 +9,7 @@ import torch
 from pytorch_lightning.callbacks import ModelCheckpoint
 import os
 #os.chdir('/home/seafood/wkdir/kg_trainer')
-
+from pytorch_lightning.callbacks import LearningRateMonitor
 import sys
 sys.path.append('.')
 
@@ -83,7 +83,9 @@ def main():
 
     summary_callback = pl.callbacks.ModelSummary(max_depth=2)
 
-    callbacks = [summary_callback, checkpoint_callback]
+
+    lr_monitor = LearningRateMonitor(logging_interval='step')
+    callbacks = [summary_callback, checkpoint_callback, lr_monitor]
     if hp.trainer.stop_early:
         early_stopping_callback = pl.callbacks.EarlyStopping(
             monitor="val_loss", mode="min", patience=args.stop_early

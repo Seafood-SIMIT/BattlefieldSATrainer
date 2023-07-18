@@ -9,8 +9,8 @@ trainer:
   debug_mode: False
 
 data:
-  hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
-  #hf_data: False
+  #hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
+  hf_data: False
   data_dir: '/root/autodl-tmp/dataset'
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
@@ -44,7 +44,7 @@ llama:
 lora:
   lora_r: 8
   lora_alpha: 64
-  lora_dropout: 0.1
+  lora_dropout: 0.05
   lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "down_proj", "up_proj"]
   
 
