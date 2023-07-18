@@ -1,0 +1,62 @@
+trainer:
+  stop_early: False
+  max_epochs: 200
+  devices: 1
+  strategy: 'deepspeed_stage_3'
+  accelerator: 'gpu'
+  fp: 16
+  gas: 8
+  debug_mode: False
+
+data:
+  #hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
+  hf_data: False
+  data_dir: '/root/autodl-tmp/dataset'
+  #data_dir: 'files/dataset/'
+  raw_file_type: 'json'
+  max_seq_length: 512
+  train_batchsize: 2
+  valid_batchsize: 2
+  do_eval_only: False
+  n_ctx: 1024
+  stride: 678
+  num_workers: 2
+  
+
+llama:
+  #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
+  #base_model: "IDEA-CCNL/Wenzhong-GPT2-110M" 
+  #base_model: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
+  base_model: 'IDEA-CCNL/Ziya-LLaMA-13B-v1.1'
+  cache_dir: '/root/autodl-tmp/ziya'
+  train_batchsize: 2
+  #cache_dir: '/Volumes/T7/FileBackup/lora_model/llama_opemlmlab'
+  load_checkpoint: False
+  ckpt_dir: '/root/autodl-tmp/ckpt/20230707_llam_whole/last.ckpt'
+  weight_decay: 0.1
+  learning_rate: 0.0001
+  warmup: 0.01
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_epsilon: 0.00000001
+  
+  
+lora:
+  lora_r: 8
+  lora_alpha: 64
+  lora_dropout: 0.05
+  lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "down_proj", "up_proj"]
+  
+
+ckpt:
+  monitor: 'train_loss'
+  save_top_k: 1
+  mode: 'min'
+  every_n_train_steps: 500
+  save_weights_only: True
+  dirpath: '/root/autodl-tmp/ckpt'
+  save_last: False
+  file_name: 'Default'
+
+test:
+  ckpt_path: '/root/autodl-tmp/ckpt/test_0.01.pt'
