@@ -20,16 +20,25 @@ data:
   do_eval_only: False
   n_ctx: 1024
   stride: 678
+<<<<<<< HEAD
   num_workers: 0
+=======
+  num_workers: 2
+>>>>>>> 5aca73e48b38ddc5234bd5285ccba96501575671
   
 
 llama:
   #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   #base_model: "IDEA-CCNL/Wenzhong-GPT2-110M" 
   #base_model: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
+<<<<<<< HEAD
   #base_model: 'IDEA-CCNL/Ziya-LLaMA-13B-v1.1'
   base_model: 'baichuan-inc/Baichuan-7B'
   cache_dir: '/root/autodl-tmp/baichuan'
+=======
+  base_model: 'IDEA-CCNL/Ziya-LLaMA-13B-v1.1'
+  cache_dir: '/root/autodl-tmp/ziya'
+>>>>>>> 5aca73e48b38ddc5234bd5285ccba96501575671
   train_batchsize: 2
   #cache_dir: '/Volumes/T7/FileBackup/lora_model/llama_opemlmlab'
   load_checkpoint: False
@@ -40,14 +49,21 @@ llama:
   adam_beta1: 0.9
   adam_beta2: 0.95
   adam_epsilon: 0.00000001
+<<<<<<< HEAD
   do_evalonly: True
+=======
+>>>>>>> 5aca73e48b38ddc5234bd5285ccba96501575671
   
   
 lora:
   lora_r: 8
   lora_alpha: 64
   lora_dropout: 0.05
+<<<<<<< HEAD
   lora_target_modules: ["W_pack"]
+=======
+  lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "down_proj", "up_proj"]
+>>>>>>> 5aca73e48b38ddc5234bd5285ccba96501575671
   
 
 ckpt:
