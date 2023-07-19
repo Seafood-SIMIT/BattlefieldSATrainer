@@ -34,10 +34,10 @@ class LlamaModule(pl.LightningModule):
             {'params': [p for n, p in self.named_parameters() if any(
                 nd in n for nd in no_decay) and p.requires_grad], 'weight_decay': 0.0}
         ]
-        #optimizer = AdamW(optimizer_grouped_params, lr=self.args_litmodel.learning_rate)
-        optimizer = FusedAdam(optimizer_grouped_params, lr=self.args_litmodel.learning_rate,adam_w_mode=True,
-                          betas=(self.args_litmodel.adam_beta1, self.args_litmodel.adam_beta2),
-                          eps=self.args_litmodel.adam_epsilon)
+        optimizer = AdamW(optimizer_grouped_params, lr=self.args_litmodel.learning_rate)
+        #optimizer = FusedAdam(optimizer_grouped_params, lr=self.args_litmodel.learning_rate,adam_w_mode=True,)
+        #                  betas=(self.args_litmodel.adam_beta1, self.args_litmodel.adam_beta2),
+        #                  eps=self.args_litmodel.adam_epsilon)
 
         return [optimizer]
 
@@ -65,12 +65,12 @@ class LlamaModule(pl.LightningModule):
                 SHOW_DATA = True
                 print('source: {}'.format(batch['input_ids'][0]))
                 print('target: {}'.format(batch['labels'][0]))
-                print('source: {}'.format(self.detokenize(batch['input_ids'][0])))
+                print('source: {}'.format(self.tokenizer.decode(batch['input_ids'][0])))
                 label_idx = batch['labels'][0] != -100
-                print('target: {}'.format(self.detokenize(
+                print('target: {}'.format(self.tokenizer.decode(
                     batch['labels'][0][label_idx])))
                 print('mask: {}'.format(batch['attention_mask'][0]))
-                #print('position_ids: {}'.format(batch['position_ids'][0]))
+                print('position_ids: {}'.format(batch['position_ids'][0]))
         output = self(**batch)
         self.log('train_loss', output.loss, on_epoch=True, prog_bar=True,logger=True)
         return output.loss

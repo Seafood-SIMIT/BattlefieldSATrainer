@@ -25,6 +25,7 @@ class LlamaDataset(Dataset):
         self.max_seq_length = args.max_seq_length
         #self.max_seq_length =-1
         self.add_special_tokens = add_special_tokens
+        
 
     def __len__(self):
         return len(self.data)
@@ -46,25 +47,22 @@ class LlamaDataset(Dataset):
         # time, mid, blue, red,trible, discription
         # conver to ids
         r_qb = item['prompt'][0]
+
         r_sa = item['output'][0]
-        prompt_ids = self.tokenizer(r_qb, add_special_tokens = False).input_ids
-        output_ids =self.tokenizer(r_sa, add_special_tokens = False).input_ids 
+        
+        prompt_ids = self.tokenizer(r_qb, add_special_tokens=False)['input_ids']
 
-        labels_ids = [-100]*(len(prompt_ids)) + output_ids
+        sa_ids = self.tokenizer(r_sa, add_special_tokens=False)['input_ids']
+        
+        labels_ids = [-100] * (len(prompt_ids)) + sa_ids
 
-        max_length = self.max_seq_length
-        target_ids = pad(labels_ids, -100,max_length)
-        input_ids = pad(prompt_ids,self.tokenizer.eos_token_id, max_length)
+        input_ids = pad(prompt_ids, self.tokenizer.eos_token_id, self.max_seq_length)
+        target_ids = pad(labels_ids, -100, self.max_seq_length)
 
-
-        return  {"input_ids": torch.tensor(input_ids).clone(),
-                 "attention_mask": torch.ones(max_length).clone(), 
-                 "position_ids": torch.arange( 0,max_length).clone(),
-                 "labels":  torch.tensor(target_ids).clone()}
-        #return  {"input_ids": torch.tensor(input_ids).unsqueeze(0).clone(),
-        #         "attention_mask": torch.ones((1, max_length)).clone(), 
-        #         "position_ids": torch.arange(0, max_length).unsqueeze(0).expand(1, max_length).clone(),
-        #         "labels":  torch.tensor(target_ids).unsqueeze(0).clone()}
+        return  {"input_ids": torch.tensor(input_ids).clone().detach(),
+                 "attention_mask": torch.ones( self.max_seq_length).clone().detach(), 
+                 "position_ids": torch.arange(0, self.max_seq_length).clone().detach(),
+                 "labels":  torch.tensor(target_ids).clone().detach()}
     
 class WYLLamaDataModule(pl.LightningDataModule):
     def __init__(self, tokenizer, args_data):

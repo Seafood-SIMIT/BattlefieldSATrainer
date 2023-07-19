@@ -3,27 +3,33 @@ from peft import (
     LoraConfig,
     get_peft_model,
     get_peft_model_state_dict,
-    prepare_model_for_int8_training,
     PeftModel,
 )
-from transformers import LlamaTokenizer, LlamaForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM
 from transformers import GPT2LMHeadModel,GPT2Tokenizer
 
 def LlamaPeftGenerate(args_model,args_lora):
-    model = LlamaForCausalLM.from_pretrained(
+    model =AutoModelForCausalLM.from_pretrained(
     #model = GPT2LMHeadModel.from_pretrained(
     args_model.base_model,
-    torch_dtype=torch.half,
+    trust_remote_code=True,
+    #torch_dtype=torch.bfloat16,
     cache_dir = args_model.cache_dir,
 )
  
-    tokenizer = LlamaTokenizer.from_pretrained(args_model.base_model,cache_dir = args_model.cache_dir)
+    tokenizer =AutoTokenizer.from_pretrained(args_model.base_model,trust_remote_code=True,cache_dir = args_model.cache_dir)
+    if tokenizer.pad_token is None:
+        tokenizer.add_special_tokens({'pad_token': '<|endoftext|>'})
     #tokenizer = GPT2Tokenizer.from_pretrained(args_model.base_model,cache_dir = args_model.cache_dir)
-    return loraTheModel(model,args_model.base_model,args_lora), tokenizer
-    #return model, tokenizer
+    #whether to use lora
+    if args_model.do_evalonly:
+        return model, tokenizer
+        
+    else:
+        return loraTheModel(model,args_model.base_model,args_lora), tokenizer
 
 def loraTheModel(model,model_id,args_lora):
-    #model = prepare_model_for_int8_training(model)
+    #model = prepare_model_for_training(model)
     config = LoraConfig(
         r=args_lora.lora_r,
         lora_alpha=args_lora.lora_alpha,

@@ -40,13 +40,14 @@ llama:
   adam_beta1: 0.9
   adam_beta2: 0.95
   adam_epsilon: 0.00000001
+  do_evalonly: True
   
   
 lora:
   lora_r: 8
   lora_alpha: 64
   lora_dropout: 0.05
-  lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "down_proj", "up_proj"]
+  lora_target_modules: ["W_pack"]
   
 
 ckpt:
