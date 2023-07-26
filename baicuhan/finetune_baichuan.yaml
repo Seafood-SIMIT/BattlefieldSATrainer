@@ -1,7 +1,7 @@
 trainer:
   stop_early: False
   max_epochs: 200
-  devices: 2
+  devices: 1
   strategy: 'deepspeed_stage_3'
   accelerator: 'gpu'
   fp: 16
@@ -9,6 +9,8 @@ trainer:
   debug_mode: False
 
 data:
+  #hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
+  hf_data: False
   data_dir: '/root/autodl-tmp/dataset'
   #data_dir: 'files/dataset/'
   raw_file_type: 'json'
@@ -19,40 +21,41 @@ data:
   n_ctx: 1024
   stride: 678
   num_workers: 2
-  #hf_data: 'IDEA-CCNL/Ziya-Finetune-Small'
-  hf_data: False
+  
 
 model:
   #pretrained_file: "IDEA-CCNL/Wenzhong-GPT2-110M" 
-  #base_model: "openlmlab/open-chinese-llama-7b-patch" 
-  base_model: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
-  #base_model: 'IDEA-CCNL/Wenzhong-GPT2-110M'
+  base_model: "IDEA-CCNL/Wenzhong-GPT2-110M" 
+  #base_model: "IDEA-CCNL/Wenzhong2.0-GPT2-3.5B-chinese" 
+  #base_model: 'baichuan-inc/Baichuan-7B'
+  cache_dir: '/root/autodl-tmp/ziya'
   train_batchsize: 2
-  #cache_dir: '/root/.cache/huggingface/'
-  cache_dir: '/root/autodl-tmp/wenzhong/'
   #cache_dir: '/Volumes/T7/FileBackup/lora_model/llama_opemlmlab'
   load_checkpoint: False
   ckpt_dir: '/root/autodl-tmp/ckpt/20230707_llam_whole/last.ckpt'
-  weight_decay: 0.00001
-  learning_rate: 0.0003
+  weight_decay: 0.1
+  learning_rate: 0.0001
   warmup: 0.01
-  use_lora: True
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_epsilon: 0.00000001
+  
+  
 lora:
   lora_r: 8
-  lora_alpha: 16
+  lora_alpha: 64
   lora_dropout: 0.05
-  lora_target_modules: [
-    "c_attn",
-]
+  lora_target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "down_proj", "up_proj"]
+  
 
 ckpt:
   monitor: 'train_loss'
   save_top_k: 1
   mode: 'min'
-  every_n_train_steps: 100
+  every_n_train_steps: 500
   save_weights_only: True
   dirpath: '/root/autodl-tmp/ckpt'
-  save_last: True
+  save_last: False
   file_name: 'Default'
 
 test:

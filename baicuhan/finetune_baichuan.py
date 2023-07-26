@@ -15,8 +15,10 @@ sys.path.append('.')
 
 from utils import HParam
 from kg_generator import *
-from baichuan.litmodel import loadModelTokenizer, BaichuanModule
-from training.data_loader import WYBaichuanDataModule
+from gpt2_generator import gpt2_model_gpt2_generator, GPT2_BaseLitModel, WenzhongQALitModel
+from training.util import import_class, setup_data_from_args
+from training.data_loader import WYLLamaDataModule
+from baichuan.lit_model.baichuan_model import loadModelTokenizerz
 #import nemo
 #from nemo.collections.nlp.parts.nlp_overrides import NLPDDPStrategy
 
@@ -39,22 +41,21 @@ def main():
 
 
     parser.add_argument("--help", "-h", action="help")
-    parser.add_argument("-c",'--config',default='config/default.yaml', type=str, help='set the config file')
+    parser.add_argument("-c",'--config',default='baichaun/finetune_baichuan.yaml', type=str, help='set the config file')
     parser.add_argument("-m","--model_name", type=str, required= True, help='model name')
 
     args = parser.parse_args()
     hp = HParam(args.config)
-    hp.model.train_batchsize = hp.data.train_batchsize
 
     model,tokenizer = loadModelTokenizer(hp.model,hp.lora)
     #data
-    data = WYBaichuanDataModule(tokenizer, hp.data)
+    data = WYLLamaDataModule(tokenizer, hp.data)
     #data = WenzhongQADataModel(hp.data, tokenizer)
-    gpt2_litmodel = BaichuanModule
+    gpt2_litmodel = LlamaModule
 
     if hp.llama.load_checkpoint == 'True':
         print('load from checkpoint')
-        gpt2_litmodel = gpt2_litmodel.load_from_checkpoint(hp.model.ckpt_path, args=hp.model, model=model,tokenizer=tokenizer)
+        gpt2_litmodel = gpt2_litmodel.load_from_checkpoint(hp.llama.ckpt_path, args=hp.llama, model=model,tokenizer=tokenizer)
     else:
         print('load from hugging face')
         gpt2_litmodel = gpt2_litmodel(args=hp.llama, model=model,tokenizer=tokenizer)
@@ -66,7 +67,7 @@ def main():
     experiment_dir = logger.log_dir
 
     #goldstar_metric = "validation/cer" if hp.gpt2.loss in ("transformer",) else "val_loss"
-    filename_format = "{epoch:04d}-{val_loss:.3f}"
+    filename_format = "epoch={epoch:04d}-validation.loss={val_loss:.3f}"
     hp.ckpt.file_name = filename_format
     arg = hp.ckpt
     hp.ckpt.dirpath = hp.ckpt.dirpath+'/'+args.model_name
