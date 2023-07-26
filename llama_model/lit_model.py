@@ -35,7 +35,7 @@ class LlamaModule(pl.LightningModule):
                 nd in n for nd in no_decay) and p.requires_grad], 'weight_decay': 0.0}
         ]
         #optimizer = AdamW(optimizer_grouped_params, lr=self.args_litmodel.learning_rate)
-        optimizer = FusedAdam(optimizer_grouped_params, lr=self.args_litmodel.learning_rate,adam_w_mode=True,)
+        optimizer = FusedAdam(optimizer_grouped_params, lr=self.args_litmodel.learning_rate,adam_w_mode=True,
                           betas=(self.args_litmodel.adam_beta1, self.args_litmodel.adam_beta2),
                           eps=self.args_litmodel.adam_epsilon)
         scheduler = get_linear_schedule_with_warmup(
